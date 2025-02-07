@@ -6,12 +6,12 @@ import (
 	"unsafe"
 )
 
-const VERSIONMAJOR c.Int = 1
-const VERSIONMINOR c.Int = 7
-const VERSIONPATCH c.Int = 18
-const IsReference c.Int = 256
-const StringIsConst c.Int = 512
-const NESTINGLIMIT c.Int = 1000
+const VERSIONMAJOR = 1
+const VERSIONMINOR = 7
+const VERSIONPATCH = 18
+const IsReference = 256
+const StringIsConst = 512
+const NESTINGLIMIT = 1000
 
 type JSON struct {
 	Next        *JSON

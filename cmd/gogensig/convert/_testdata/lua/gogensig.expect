@@ -6,10 +6,10 @@ import (
 	"unsafe"
 )
 
-const GNAME string = "_G"
-const LOADEDTABLE string = "_LOADED"
-const PRELOADTABLE string = "_PRELOAD"
-const FILEHANDLE string = "FILE*"
+const GNAME = "_G"
+const LOADEDTABLE = "_LOADED"
+const PRELOADTABLE = "_PRELOAD"
+const FILEHANDLE = "FILE*"
 
 type Buffer struct {
 	B    *int8
@@ -129,64 +129,64 @@ import (
 	"unsafe"
 )
 
-const VERSIONMAJOR string = "5"
-const VERSIONMINOR string = "4"
-const VERSIONRELEASE string = "7"
-const VERSIONNUM c.Int = 504
-const AUTHORS string = "R. Ierusalimschy, L. H. de Figueiredo, W. Celes"
-const SIGNATURE string = "\x1bLua"
-const OK c.Int = 0
-const YIELD c.Int = 1
-const ERRRUN c.Int = 2
-const ERRSYNTAX c.Int = 3
-const ERRMEM c.Int = 4
-const ERRERR c.Int = 5
-const TNIL c.Int = 0
-const TBOOLEAN c.Int = 1
-const TLIGHTUSERDATA c.Int = 2
-const TNUMBER c.Int = 3
-const TSTRING c.Int = 4
-const TTABLE c.Int = 5
-const TFUNCTION c.Int = 6
-const TUSERDATA c.Int = 7
-const TTHREAD c.Int = 8
-const NUMTYPES c.Int = 9
-const MINSTACK c.Int = 20
-const RIDXMAINTHREAD c.Int = 1
-const RIDXGLOBALS c.Int = 2
-const OPADD c.Int = 0
-const OPSUB c.Int = 1
-const OPMUL c.Int = 2
-const OPMOD c.Int = 3
-const OPPOW c.Int = 4
-const OPDIV c.Int = 5
-const OPIDIV c.Int = 6
-const OPBAND c.Int = 7
-const OPBOR c.Int = 8
-const OPBXOR c.Int = 9
-const OPSHL c.Int = 10
-const OPSHR c.Int = 11
-const OPUNM c.Int = 12
-const OPBNOT c.Int = 13
-const OPEQ c.Int = 0
-const OPLT c.Int = 1
-const OPLE c.Int = 2
-const GCSTOP c.Int = 0
-const GCRESTART c.Int = 1
-const GCCOLLECT c.Int = 2
-const GCCOUNT c.Int = 3
-const GCCOUNTB c.Int = 4
-const GCSTEP c.Int = 5
-const GCSETPAUSE c.Int = 6
-const GCSETSTEPMUL c.Int = 7
-const GCISRUNNING c.Int = 9
-const GCGEN c.Int = 10
-const GCINC c.Int = 11
-const HOOKCALL c.Int = 0
-const HOOKRET c.Int = 1
-const HOOKLINE c.Int = 2
-const HOOKCOUNT c.Int = 3
-const HOOKTAILCALL c.Int = 4
+const VERSIONMAJOR = "5"
+const VERSIONMINOR = "4"
+const VERSIONRELEASE = "7"
+const VERSIONNUM = 504
+const AUTHORS = "R. Ierusalimschy, L. H. de Figueiredo, W. Celes"
+const SIGNATURE = "\x1bLua"
+const OK = 0
+const YIELD = 1
+const ERRRUN = 2
+const ERRSYNTAX = 3
+const ERRMEM = 4
+const ERRERR = 5
+const TNIL = 0
+const TBOOLEAN = 1
+const TLIGHTUSERDATA = 2
+const TNUMBER = 3
+const TSTRING = 4
+const TTABLE = 5
+const TFUNCTION = 6
+const TUSERDATA = 7
+const TTHREAD = 8
+const NUMTYPES = 9
+const MINSTACK = 20
+const RIDXMAINTHREAD = 1
+const RIDXGLOBALS = 2
+const OPADD = 0
+const OPSUB = 1
+const OPMUL = 2
+const OPMOD = 3
+const OPPOW = 4
+const OPDIV = 5
+const OPIDIV = 6
+const OPBAND = 7
+const OPBOR = 8
+const OPBXOR = 9
+const OPSHL = 10
+const OPSHR = 11
+const OPUNM = 12
+const OPBNOT = 13
+const OPEQ = 0
+const OPLT = 1
+const OPLE = 2
+const GCSTOP = 0
+const GCRESTART = 1
+const GCCOLLECT = 2
+const GCCOUNT = 3
+const GCCOUNTB = 4
+const GCSTEP = 5
+const GCSETPAUSE = 6
+const GCSETSTEPMUL = 7
+const GCISRUNNING = 9
+const GCGEN = 10
+const GCINC = 11
+const HOOKCALL = 0
+const HOOKRET = 1
+const HOOKLINE = 2
+const HOOKCOUNT = 3
+const HOOKTAILCALL = 4
 
 type State struct {
 	Unused [8]uint8
@@ -436,30 +436,27 @@ const LLGoPackage string = "link: $(pkg-config --libs lua);"
 ===== luaconf.go =====
 package lua
 
-import (
-	"github.com/goplus/llgo/c"
-	_ "unsafe"
-)
+import _ "unsafe"
 
-const INTINT c.Int = 1
-const INTLONG c.Int = 2
-const INTLONGLONG c.Int = 3
-const FLOATFLOAT c.Int = 1
-const FLOATDOUBLE c.Int = 2
-const FLOATLONGDOUBLE c.Int = 3
-const X32BITS c.Int = 0
-const C89NUMBERS c.Int = 0
-const PATHSEP string = ";"
-const PATHMARK string = "?"
-const EXECDIR string = "!"
-const ROOT string = "/opt/homebrew/"
-const DIRSEP string = "/"
-const IGMARK string = "-"
-const NUMBERFRMLEN string = ""
-const NUMBERFMT string = "%.14g"
-const INTEGERFRMLEN string = "ll"
-const LUAIMAXSTACK c.Int = 1000000
-const IDSIZE c.Int = 60
+const INTINT = 1
+const INTLONG = 2
+const INTLONGLONG = 3
+const FLOATFLOAT = 1
+const FLOATDOUBLE = 2
+const FLOATLONGDOUBLE = 3
+const X32BITS = 0
+const C89NUMBERS = 0
+const PATHSEP = ";"
+const PATHMARK = "?"
+const EXECDIR = "!"
+const ROOT = "/opt/homebrew/"
+const DIRSEP = "/"
+const IGMARK = "-"
+const NUMBERFRMLEN = ""
+const NUMBERFMT = "%.14g"
+const INTEGERFRMLEN = "ll"
+const LUAIMAXSTACK = 1000000
+const IDSIZE = 60
 
 ===== lualib.go =====
 package lua
@@ -469,15 +466,15 @@ import (
 	_ "unsafe"
 )
 
-const COLIBNAME string = "coroutine"
-const TABLIBNAME string = "table"
-const IOLIBNAME string = "io"
-const OSLIBNAME string = "os"
-const STRLIBNAME string = "string"
-const UTF8LIBNAME string = "utf8"
-const MATHLIBNAME string = "math"
-const DBLIBNAME string = "debug"
-const LOADLIBNAME string = "package"
+const COLIBNAME = "coroutine"
+const TABLIBNAME = "table"
+const IOLIBNAME = "io"
+const OSLIBNAME = "os"
+const STRLIBNAME = "string"
+const UTF8LIBNAME = "utf8"
+const MATHLIBNAME = "math"
+const DBLIBNAME = "debug"
+const LOADLIBNAME = "package"
 //go:linkname Base C.luaopen_base
 func Base(L *State) c.Int
 //go:linkname Coroutine C.luaopen_coroutine

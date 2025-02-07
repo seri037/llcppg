@@ -2,7 +2,6 @@ package convert
 
 import (
 	"fmt"
-	"math"
 	"strconv"
 
 	"github.com/goplus/llcppg/ast"
@@ -20,7 +19,7 @@ func Expr(e ast.Expr) *ExprWrap {
 func (p *ExprWrap) ToInt() (int, error) {
 	v, ok := p.e.(*ast.BasicLit)
 	if ok && v.Kind == ast.IntLit {
-		v, _, err := litToInt(v.Value)
+		v, err := litToInt(v.Value)
 		if err != nil {
 			return 0, err
 		}
@@ -65,47 +64,14 @@ func (p *ExprWrap) IsVoid() bool {
 	return false
 }
 
-type IntType string
-
-const (
-	TypeInt   IntType = "Int"
-	TypeUint  IntType = "Uint"
-	TypeLong  IntType = "Long"
-	TypeUlong IntType = "Ulong"
-)
-
 // litToInt parses a string literal into an int64 value.
 // It returns the value and the smallest IntType that can hold the value.
-func litToInt(lit string) (int64, IntType, error) {
-	val, err := strconv.ParseInt(lit, 0, 64)
-	if err != nil {
-		return 0, TypeInt, err
-	}
-
-	if val < 0 {
-		if val >= math.MinInt32 {
-			return val, TypeInt, nil
-		}
-		return val, TypeLong, nil
-	}
-	return val, TypeInt, nil
+func litToInt(lit string) (int64, error) {
+	return strconv.ParseInt(lit, 0, 64)
 }
 
-// litToUint parses a string literal into a uint64 value.
-// It returns the value and the smallest IntType that can hold the value.
-func litToUint(lit string) (uint64, IntType, error) {
-	uval, err := strconv.ParseUint(lit, 0, 64)
-	if err != nil {
-		return 0, TypeInt, err
-	}
-	switch {
-	case uval <= math.MaxInt32:
-		return uval, TypeInt, nil
-	case uval <= math.MaxUint32:
-		return uval, TypeUint, nil
-	default:
-		return uval, TypeUlong, nil
-	}
+func litToUint(lit string) (uint64, error) {
+	return strconv.ParseUint(lit, 0, 64)
 }
 
 func litToFloat(lit string, bitSize int) (float64, error) {
