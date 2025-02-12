@@ -56,6 +56,7 @@ cjson/
 ├── cJSON.go
 ├── cJSON_Utils.go
 ├── cjson_autogen_link.go
+├── llcppg.pub
 ├── go.mod
 └── go.sum
 ```
@@ -144,8 +145,16 @@ func (p *CJSON) AddItemToObject(string *int8, item *CJSON) CJSONBool {
 }
 ```
 
-### Customizing Bindings
+You can also observe the corresponding type name transformations. The generated `llcppg.pub` file contains a mapping table from C types to Go type names (which will be used for package dependency handling). For the example above, the `llcppg.pub` file looks like this, where the first field on the left is the C type and the first field on the right is the corresponding Go type name.
+```
+cJSON CJSON
+cJSON_Hooks Hooks
+cJSON_bool Bool
+```
+ You can customize these type mappings by editing this file (see [Customizing Bindings](#type-customization)).
 
+### Customizing Bindings
+#### Function Customization
 When you run llcppg directly with the above configuration, it will generate function names according to the configuration. After execution, you'll find a `llcppg.symb.json` file in the current directory. 
 
 ```json
@@ -208,6 +217,22 @@ llcppg -symbgen
 If you only want to generate Go code using an already generated symbol table, execute:
 ```sh
 llcppg -codegen
+```
+#### Type Customization
+The `llcppg.pub` file maintains type mapping relationships between C and Go. You can customize these mappings to better suit your needs.
+For instance, if you prefer to use `JSON` instead of `cJSON` as the Go type name, simply modify the `llcppg.pub` file as follows:
+```
+cJSON JSON
+```
+After running llcppg again, all generated code will use the new type name. The struct definition and its methods will be automatically updated:
+```go
+type JSON struct {
+  // .....
+}
+// llgo:link (*JSON).PrintBuffered C.cJSON_PrintBuffered
+func (recv_ *JSON) PrintBuffered(prebuffer c.Int, fmt Bool) *int8 {
+	return nil
+}
 ```
 
 More demo projects and configuration files can be found under `_llcppgtest` directory.
