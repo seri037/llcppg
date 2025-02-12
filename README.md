@@ -237,6 +237,34 @@ func (recv_ *JSON) PrintBuffered(prebuffer c.Int, fmt Bool) *int8 {
 
 More demo projects and configuration files can be found under `_llcppgtest` directory.
 
+### Dependency
+
+You can specify dependent package paths in the `deps` field of `llcppg.cfg` . For example, in the `_llcppgtest/libxslt` example, since libxslt depends on libxml2, its configuration file looks like this:
+```json
+{
+  "name": "libxslt",
+  "cflags": "$(pkg-config --cflags libxslt)",
+  "libs": "$(pkg-config --libs libxslt)",
+  "deps": ["github.com/luoliwoshang/llcppg-libxml"],
+  // ... other configurations
+}
+```
+For this project, llcppg will automatically handle type references to libxml2. During the process, llcppg uses the `llcppg.pub` file from the generated libxml2 package to ensure type consistency.
+You can see this in the generated code, where libxslt correctly references libxml2's types and functions:
+```go
+type X_XsltDocument struct {
+    Next           *X_XsltDocument
+    Main           c.Int
+    Doc            libxml_2_0.XmlDocPtr
+    Keys           unsafe.Pointer
+    Includes       *X_XsltDocument
+    Preproc        c.Int
+    NbKeysComputed c.Int
+}
+
+type XsltSortFunc func(XsltTransformContextPtr, *libxml_2_0.XmlNodePtr, c.Int)
+```
+
 ### Important Note on Header File Ordering
 
 llcppg follows C language's dependency resolution order when processing header files. The order of files in the `includes` configuration determines the processing sequence, and incorrect ordering can lead to type resolution failures. Here's an example from the LZMA library that demonstrates the dependency relationships:
