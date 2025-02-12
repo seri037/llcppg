@@ -16,6 +16,44 @@ A suite of tools for generating LLpkgs.
 
 # Generation
 
+## Directory structure
+
+We design a whole new storage structure for llpkg store.
+
+```
++ {LibraryName}
+   |
+   +--  {NormalGoPkgFiles}
+   |    |
+   |    +-- llpkg.cfg
+   |    |
+   |    +-- llcppg.cfg
+   |
+   +-- .llpkg
+         |
+         +-- llcppg.symb.json
+         |
+         +-- llcppg.pub
+
+```
+
+`llpkg.cfg` declares essential information for llgo module.
+
+`llcppg.cfg` / `llcppg.symb.json` / `llcppg.pub` for customizing generation behavior in `llcppg` tool.
+
+To indicate module's version, we follow Go's version management for nested module.
+
+We tag `{LibraryName}/{Version}` for each `{LibraryName}` version.
+
+For example
+`libcjson/v1.7.18`
+
+The advantage of this design is that it's fully compatible with native Go module.
+
+Hence, it's simple to get llgo module using `go get` like
+
+`go get github.com/goplus/llpkg/libcjson@v1.7.18`
+
 ## Reproducible Builds
 
 A standardized methodology to generate compliant, reproducible, and controllable LLpkgs:
@@ -30,8 +68,8 @@ The recommended approach is to upload only configuration files and automate gene
 
 ### Reason
 
--   Direct user publication carries risks of post-generation malicious code insertion and review challenges.
--   Platform-specific code may require different llcppg.symb.json to be generated, and should be renamed as `{$FILENAME}_{$GOOS}_{$GOARCH}`.
+- Direct user publication carries risks of post-generation malicious code insertion and review challenges.
+- Platform-specific code may require different llcppg.symb.json to be generated, and should be renamed as `{$FILENAME}_{$GOOS}_{$GOARCH}`.
 
 ### Workflow
 
@@ -56,9 +94,9 @@ Process:
 2. Use `go get` with the transformed address to download the LLpkg
 3. Process configuration:
 
--   Read `llpkg.cfg`
--   Run `conan install` for binaries
--   Activate environment variables for building (or use .pc file method)
+- Read `llpkg.cfg`
+- Run `conan install` for binaries
+- Activate environment variables for building (or use .pc file method)
 
 # Details
 
@@ -66,54 +104,54 @@ Process:
 
 To handle functional differences across platforms:
 
--   Store platform-specific symbol mappings in `.llpkg/`
--   File naming format:
-    `{$PACKAGE_NAME}_{$GOOS}_{$GOARCH}.symb.json`
-    (e.g., `openssl_linux_amd64.symb.json`)
+- Store platform-specific symbol mappings in `.llpkg/`
+- File naming format:
+  `{$PACKAGE_NAME}_{$GOOS}_{$GOARCH}.symb.json`
+  (e.g., `openssl_linux_amd64.symb.json`)
 
 ## Version Conversion Rules
 
 1. **Semver-compliant versions**: Use directly
 
-    Example: 2.1.5 → 2.1.5
+   Example: 2.1.5 → 2.1.5
 
 2. **Non-Semver versions**: Convert using pattern:
 
-    `0.0.0-0-{original_version}`
+   `0.0.0-0-{original_version}`
 
-    Conversion steps:
+   Conversion steps:
 
-    1. Replace dots with hyphens: `2023.07.05` → `2023-07-05`
+   1. Replace dots with hyphens: `2023.07.05` → `2023-07-05`
 
-    2. Append `0-` prefix
+   2. Append `0-` prefix
 
-    Examples:
+   Examples:
 
-    - `2023Q4 → 0.0.0-0-2023Q4`
-    - `2023.07.05 → 0.0.0-0-2023-07-05`
-    - `0067 → 0.0.0-0-0067`
+   - `2023Q4 → 0.0.0-0-2023Q4`
+   - `2023.07.05 → 0.0.0-0-2023-07-05`
+   - `0067 → 0.0.0-0-0067`
 
 ## File Structure of llpkg.cfg
 
 ```json
 {
-    "package": {
-        "name": "cjson",
-        "version": "1.7.18"
-    },
-    "upstream": {
-        "name": "conan",
-        "config": {
-            "generator": "cmake",
-            "options": ""
-        }
-    },
-    "toolchain": {
-        "name": "llcppg",
-        "version": "0.9.7",
-        "config": {
-            "trimPrefixes": []
-        }
+  "package": {
+    "name": "cjson",
+    "version": "1.7.18"
+  },
+  "upstream": {
+    "name": "conan",
+    "config": {
+      "generator": "cmake",
+      "options": ""
     }
+  },
+  "toolchain": {
+    "name": "llcppg",
+    "version": "0.9.7",
+    "config": {
+      "trimPrefixes": []
+    }
+  }
 }
 ```
