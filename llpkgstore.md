@@ -69,7 +69,6 @@ The recommended approach is to upload only configuration files and automate gene
 ### Reason
 
 - Direct user publication carries risks of post-generation malicious code insertion and review challenges.
-- Platform-specific code may require different llcppg.symb.json to be generated, and should be renamed as `{$FILENAME}_{$GOOS}_{$GOARCH}`.
 
 ### Workflow
 
@@ -99,15 +98,6 @@ Process:
 - Activate environment variables for building (or use .pc file method)
 
 # Details
-
-## Platform-Specific Builds
-
-To handle functional differences across platforms:
-
-- Store platform-specific symbol mappings in `.llpkg/`
-- File naming format:
-  `{$PACKAGE_NAME}_{$GOOS}_{$GOARCH}.symb.json`
-  (e.g., `openssl_linux_amd64.symb.json`)
 
 ## Version Conversion Rules
 
