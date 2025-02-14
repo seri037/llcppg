@@ -53,18 +53,22 @@ Recommended approach to maintain security and reproducibility:
 ## Usage
 Install LLpkgs using:
 ```bash
-llgo get pkgname@version
+llgo get clib@cversion
+llgo get module_path@module_version
 ```
 
-(Where version corresponds to the original C library version)
+1. `clib` corresponds to the original library name in C, and `cversion` corresponds to the original version in C.
+2. `llgo get clib` == `llgo get clib@latest`, which retrieves the latest llpkg's Go module of the latest `cversion` of `clib`.
+3. Suggestion: Add `llgo list clib` to inform users of the version mapping information of `clib` (mapping info is generated based on llpkgstore.json).
 
 Installation process:
-1. Prepend `github.com/goplus/llpkg` address to `pkgname` and convert `version` according to specified rules
-2. Download LLpkg via `go get`
-3. Process configuration:
-   - Read llpkg.cfg
-   - Run `conan install` for binaries
-   - Store .pc files for building
+1. `llgo get` follows the Go Module mechanism to obtain the corresponding version of the Go module.
+2. Check if the pulled Go module contains `llpkg.cfg` to determine if it is a llpkg.
+3. If it is: 
+  - Run `conan install` for binaries.
+  - Store `.pc` files for building.
+  - Add a comment in the `go.mod` file indicating the original version of the corresponding C library for this llpkg.
+
 ## Version Conversion Rules [wip]
 
 There are two methods for converting versions:
