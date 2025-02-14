@@ -91,7 +91,41 @@ There are two methods for converting versions:
 
 #### Mapping File Structure
 
+We have designed the following files for mapping query conversion version numbers.
+
+`llpkgstore.json`:
+
+```json
+{
+    "cgood": {
+        "versions" : [{
+            "original": "1.3",
+            "converted": ["v0.1.0", "v1.0.1"]
+        }, 
+        {
+            "original": "1.3.1",
+            "converted": ["v1.1.0"]
+        }]
+    }
+}
+```
+
+- `original` represents the original C library version number.
+- `converted` represents the converted version numbers.
+
+The relationship between the original C library version number and the converted version numbers is one-to-many, mainly due to the need to regenerate the llcppg updates.
+
 #### Web Service
+
+The main purpose is to provide a download of the mapping table.
+
+- **llpkg.goplus.org**
+
+This domain is hosted by GitHub Pages, and the `llpkgstore.json` file is located in the same branch as GitHub Pages.
+
+When running `llgo get`, it will download the file to the local `LLGOMODCACHE` directory.
+
+`LLGOMODCACHE` is an environment variable.
 
 ### 3. Comparison
 
