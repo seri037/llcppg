@@ -148,17 +148,37 @@ When running `llgo get`, it will download the file to the local `LLGOMODCACHE` d
 
 ### 3. Comparison
 
+Related discussions: https://github.com/semver/semver/issues/522
+
 #### Formula
 
 **Advantages**:
 
+1. Distributable and Decentralized
+
+2. Fully Automated
+
+3. Simpler Engineering
+
 **Disadvantages**:
+
+1. Difficult to Define
+
+2. Lacks Semantic Meaning
 
 #### Mapping
 
 **Advantages**:
 
+1. Highly Customizable
+
+2. Precise Representation: It can be meticulously defined to represent specific API modifications.
+
 **Disadvantages**:
+
+1. Requires Manual Intervention: Version numbers must be determined manually, making it impossible to fully automate.
+
+2. Centralized Maintenance: A mapping service must be maintained, which prevents decentralization.
 
 ## Configuration
 ### llpkg.cfg Structure
