@@ -63,10 +63,10 @@ llgo get module_path@module_version
 
 Installation process:
 1. `llgo get` follows the Go Module mechanism to obtain the corresponding version of the Go module.
-2. Check if the pulled Go module contains `llpkg.cfg` to determine if it is an llpkg.
+2. Check if the pulled Go module contains `llpkg.cfg` to determine if it is a llpkg.
 3. If it is: 
-  - Run `conan install` for binaries
-  - Store `.pc` files for building
+  - Run `conan install` for binaries.
+  - Store `.pc` files for building.
   - Add a comment in the `go.mod` file indicating the original version of the corresponding C library for this llpkg.
 
 ## Version Conversion Rules [wip]
