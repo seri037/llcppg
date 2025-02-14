@@ -90,14 +90,18 @@ There are two methods for converting versions:
 #### Semver Bumping Rules
 
 **Initial Version**
+
   If the C package is stable, then start with `v1.0.0`; Otherwise, start with `v0.1.0`.
+  
 **Bumping Rules**
+
   We don't have to obey the original version's bump due to the original version may not follow the SemVer rules.
   - MAJOR version bump: When the C library has made incompatible API changes (MAJOR).
   - MINOR version bump: When the C library has added functionality in a backwards-compatible manner (MINOR), or it has backward compatible bug fixes (**PATCH**). For example, the original version is `v1.0.0`, and the new version would be `v1.1.0`.
   - PATCH version bump: When we found a bug in the previous llpkg (**Not Related to the C library**), we will bump the patch version.
   - Pre-release versions of C library like `v1.2.3-beta.2` would not be accepted.
   - **Note**: Please note that the version number of the llpkg is **not related** to the version number of the C library. The PATCH update of the c library will be the MINOR update of the llpkg, as the PATCH update of the llpkg is related to llpkg bug fixes.
+
 #### Mapping File Structure
 
 #### Web Service
