@@ -30,9 +30,9 @@ const (
 )
 
 type GpgrtLockT struct {
-	X_Vers c.Long
+	X_vers c.Long
 	U      struct {
-		X_Priv [64]int8
+		X_priv [64]int8
 	}
 }
 // llgo:link (*GpgrtLockT).LockInit C.gpgrt_lock_init
