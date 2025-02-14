@@ -115,6 +115,8 @@ We have designed the following files for mapping query conversion version number
 
 The relationship between the original C library version number and the converted version numbers is one-to-many, mainly due to the need to regenerate the llcppg updates.
 
+`llgo get` is expected to select the largest version from the `converted` field.
+
 #### Web Service
 
 The main purpose is to provide a download of the mapping table.
