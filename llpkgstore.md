@@ -66,6 +66,11 @@ Installation process:
    - Run `conan install` for binaries
    - Store .pc files for building
 ## Version Conversion Rules [wip]
+
+There are two methods for converting versions:
+
+### 1. Conversion by a formula
+
 1. **Semver-compliant versions**: Use directly
    - Example: 2.1.5 → 2.1.5
 2. **Non-Semver versions**: Convert using pattern:
@@ -79,6 +84,29 @@ Installation process:
    - `2023Q4 → 0.0.0-0-2023Q4`
    - `2023.07.05 → 0.0.0-0-2023-07-05`
    - `0067 → 0.0.0-0-0067`
+
+### 2. Conversion by mapping
+
+#### Semver Bumping Rules
+
+#### Mapping File Structure
+
+#### Web Service
+
+### 3. Comparison
+
+#### Formula
+
+**Advantages**:
+
+**Disadvantages**:
+
+#### Mapping
+
+**Advantages**:
+
+**Disadvantages**:
+
 ## Configuration
 ### llpkg.cfg Structure
 ```json
