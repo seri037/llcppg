@@ -42,12 +42,12 @@ Standardized methodology for generating compliant, reproducible LLpkgs:
 3. Debug and re-generate LLpkg by modifying the configuration file
 ### Publication via GitHub Action
 Recommended approach to maintain security and reproducibility:
-**Workflow:**
+**Workflow**:
 1. Validate configuration files (llpkg.cfg & *.symb.json)
 2. Create PR to trigger GitHub Action
 3. Review generated LLpkg
 4. Merge PR with version tag
-**Maintenance:**
+**Maintenance**:
 - Updates must be published as new versions with -patchX suffix
 - Example: `version` -> `version-patch1`
 ## Usage
@@ -71,12 +71,12 @@ Installation process:
 
 ## Version Conversion Rules [wip]
 
-There are two methods for converting versions:
+There are two methods for converting versions.
 
-### 1. Conversion by a formula
+**1. Conversion by a formula**
 
 1. **Semver-compliant versions**: Use directly
-   - Example: 2.1.5 → 2.1.5
+   - Example: 2.1.5 → v2.1.5
 2. **Non-Semver versions**: Convert using pattern:
    ``` 
    0.0.0-0-{original_version}
@@ -89,24 +89,68 @@ There are two methods for converting versions:
    - `2023.07.05 → 0.0.0-0-2023-07-05`
    - `0067 → 0.0.0-0-0067`
 
-### 2. Conversion by mapping
+---
 
-#### Semver Bumping Rules
+**2. Conversion by mapping**
 
-**Initial Version**
+### Initial Version
 
-  If the C package is stable, then start with `v1.0.0`; Otherwise, start with `v0.1.0`.
+  If the C package is stable, then start with `v1.0.0` (cjson@1.7.18)
   
-**Bumping Rules**
+  Otherwise, start with `v0.1.0`. (libass@0.17.3)
+  
+### Bumping Rules
 
-  We don't have to obey the original version's bump due to the original version may not follow the SemVer rules.
-  - MAJOR version bump: When the C library has made incompatible API changes (MAJOR).
-  - MINOR version bump: When the C library has added functionality in a backwards-compatible manner (MINOR), or it has backward compatible bug fixes (**PATCH**). For example, the original version is `v1.0.0`, and the new version would be `v1.1.0`.
-  - PATCH version bump: When we found a bug in the previous llpkg (**Not Related to the C library**), we will bump the patch version.
+  | Component | Trigger Condition | Example |
+  |-----------|--------------------|---------|
+  | **MAJOR** | Breaking changes introduced by upstream C library updates. | `cjson@1.7.18` → `1.0.0`, `cjson@2.0` → `2.0.0` |
+  | **MINOR** | Non-breaking upstream updates (features/fixes). Corresponds to **any** upstream version increments in `MINOR` or `PATCH` fields. | `cjson@1.7.19` (vs `1.7.18`) → `1.1.0`; `cjson@1.8.0` → `1.2.0` |
+  | **PATCH** | LLpkg internal fixes **unrelated** to upstream changes, or upstream patches on history versions. | `llpkg@1.0.0` → `1.0.1` |
+
+  - Currently, we only consider C library updates since the first release of a llpkg.
   - Pre-release versions of C library like `v1.2.3-beta.2` would not be accepted.
   - **Note**: Please note that the version number of the llpkg is **not related** to the version number of the C library. The PATCH update of the c library will be the MINOR update of the llpkg, as the PATCH update of the llpkg is related to llpkg bug fixes.
 
-#### Mapping File Structure
+### Branch Maintenance Strategy
+
+**Context**:
+- Existing repository tracks upstream `cjson@1.6` with historical versions:  
+  `cjson@1.5.7`, `cjson@1.5.6`, `cjson@1.6`.  
+- Upstream releases `1.5.8` targeting older `1.5.x` series.
+
+**Rule**:
+
+`1.5.8` **cannot** be merged into `main` branch (currently tracking `1.6`). Instead, we should create a new branch and commit to it.
+
+### Prohibition of Legacy Patch Maintenance
+
+**Problem Scenario**:
+
+| C Library Version | llpkg Version | Issue |
+|--------------------|---------------|-------|
+| 1.5.1             | `1.0.0`       | Initial release |
+| 1.5.1 (llpkg fix) | `1.0.1`       | Patch increment |
+| 1.6               | `1.1.0`       | Minor increment |
+| 1.5.2             | ?             | Conflict: `1.1.0` already allocated |
+
+`cjson@1.5.2` > `cjson@1.5.1` maps to `llpkg@1.0.2` < `llpkg@1.0.3` (breaking version ordering).  
+This causes MVS to prioritize `1.0.3` (lower priority upstream version) over `1.0.2`.
+
+**Conflict Resolution Rule**:  
+
+When upstream releases patch updates for **previous minor versions**:
+- NO further patches shall be applied to earlier upstream patch versions
+- ALL maintenance MUST target the **newest upstream patch version**
+
+**Rationale**:  
+New patch updates from upstream naturally replace older fixes. Keeping old patch versions creates unnecessary differences that don't align with SemVer principles **and may leave security vulnerabilities unpatched**。
+
+**Workflow**:
+- cjson@1.5.8 released → llpkg MUST update from latest 1.5.x baseline (1.5.7)
+- Original cjson@1.5.1 branch becomes immutable
+
+
+### Mapping File Structure
 
 We have designed the following files for mapping query conversion version numbers.
 
@@ -134,7 +178,7 @@ The relationship between the original C library version number and the converted
 
 `llgo get` is expected to select the largest version from the `converted` field.
 
-#### Web Service
+### Web Service
 
 The main purpose is to provide a download of the mapping table.
 
@@ -146,11 +190,13 @@ When running `llgo get`, it will download the file to the local `LLGOMODCACHE` d
 
 `LLGOMODCACHE` is an environment variable.
 
-### 3. Comparison
+---
+
+**3. Comparison**
 
 Related discussions: https://github.com/semver/semver/issues/522
 
-#### Formula
+### Formula
 
 **Advantages**:
 
@@ -166,7 +212,7 @@ Related discussions: https://github.com/semver/semver/issues/522
 
 2. Lacks Semantic Meaning
 
-#### Mapping
+### Mapping
 
 **Advantages**:
 
