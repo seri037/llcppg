@@ -86,7 +86,7 @@ Install LLpkg process:
 One usage is to store `.pc` files of the C library and allow `llgo build` to find them
 
 1. Initialized as `${GOPATH}/llgo/pkg/mod`
-2. if GOPATH is empty, it defaults to `{HOME}/llgo/pkg/mod`
+2. if GOPATH is empty, it defaults to `${HOME}/llgo/pkg/mod`
 3. `{LLGOMODCACHE}/{module_path}/{module_name}@{module_version}/` stores a binary `.pc` file of the C library corresponding to the Go Module
 
 ```
