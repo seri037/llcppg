@@ -76,7 +76,7 @@ There are two methods for converting versions.
 **1. Conversion by a formula**
 
 1. **Semver-compliant versions**: Use directly
-   - Example: 2.1.5 → 2.1.5
+   - Example: 2.1.5 → v2.1.5
 2. **Non-Semver versions**: Convert using pattern:
    ``` 
    0.0.0-0-{original_version}
@@ -105,7 +105,7 @@ There are two methods for converting versions.
   |-----------|--------------------|---------|
   | **MAJOR** | Breaking changes introduced by upstream C library updates. | `cjson@1.7.18` → `1.0.0`, `cjson@2.0` → `2.0.0` |
   | **MINOR** | Non-breaking upstream updates (features/fixes). Corresponds to **any** upstream version increments in `MINOR` or `PATCH` fields. | `cjson@1.7.19` (vs `1.7.18`) → `1.1.0`; `cjson@1.8.0` → `1.2.0` |
-  | **PATCH** | Internal fixes **unrelated** to upstream changes. | `llpkg@1.0.0` → `1.0.1` |
+  | **PATCH** | LLpkg internal fixes **unrelated** to upstream changes, or upstream patches on history versions. | `llpkg@1.0.0` → `1.0.1` |
 
   - Currently, we only consider C library updates since the first release of a llpkg.
   - Pre-release versions of C library like `v1.2.3-beta.2` would not be accepted.
