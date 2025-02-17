@@ -29,11 +29,9 @@ We design a whole new storage structure for llpkg store.
 ### Version Management
 Follow Go's version management for nested modules. Tag `{LibraryName}/{Version}` for each version.
 
-Example:
-`libcjson/v1.7.18`
 This design is fully compatible with native Go modules, enabling simple installation via:
 ```bash
-go get github.com/goplus/llpkg/libcjson@v1.7.18
+llgo get github.com/goplus/llpkg/libcjson@v1.7.18
 ```
 ### Reproducible Builds
 Standardized methodology for generating compliant, reproducible LLpkgs:
@@ -50,24 +48,38 @@ Recommended approach to maintain security and reproducibility:
 **Maintenance:**
 - Updates must be published as new versions with -patchX suffix
 - Example: `version` -> `version-patch1`
-## Usage
-Install LLpkgs using:
+
+## Llgo Get Usage
+
+Install LLpkg using:
 ```bash
 llgo get clib@cversion
 llgo get module_path@module_version
 ```
 
 1. `clib` corresponds to the original library name in C, and `cversion` corresponds to the original version in C.
-2. `llgo get clib` == `llgo get clib@latest`, which retrieves the latest llpkg's Go module of the latest `cversion` of `clib`.
-3. Suggestion: Add `llgo list clib` to inform users of the version mapping information of `clib` (mapping info is generated based on llpkgstore.json).
+2. `llgo get clib`: the module path of the C library needs to be queried from the version mapping table based on clib, which is equivalent to `llgo get module_path@latest` and retrieves the latest llpkg's Go module of clib.
+3. Suggestion: Add `llgo clist clib` to inform users of the version mapping information of clib(mapping info is generated based on llpkgstore.json).
+  ```
+  The available Go module version of this C original version:
+  format: c original version => go module versions
 
-Installation process:
-1. `llgo get` follows the Go Module mechanism to obtain the corresponding version of the Go module.
+  1.3 => ["v0.1.0", "v1.0.1"]
+  1.3.1 => ["v1.1.0"]
+  ```
+
+Installation LLpkg process:
+
+1. `llgo get` follows the Go Module to obtain the corresponding version of the Go module.
 2. Check if the pulled Go module contains `llpkg.cfg` to determine if it is a llpkg.
-3. If it is: 
-  - Run `conan install` for binaries.
-  - Store `.pc` files for building.
-  - Add a comment in the `go.mod` file indicating the original version of the corresponding C library for this llpkg.
+3. If it is, `llgo get` need do extra things: 
+  - Run `conan install` for binaries and Store `.pc` files for building In LLPKGBINCache which is an environment variable.
+  - Add a comment in the `go.mod` file indicating the original version of the corresponding C library for this llpkg and Ignore indirect dependence for now.
+  ```go.mod
+  require (
+      github.com/google/llpkg/cjson v1.1.0  // cjson-1.7.18
+  )
+  ```
 
 ## Version Conversion Rules [wip]
 
