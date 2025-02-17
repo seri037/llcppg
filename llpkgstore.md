@@ -68,18 +68,34 @@ llgo get module_path@module_version
   1.3.1 => ["v1.1.0"]
   ```
 
-Installation LLpkg process:
+Install LLpkg process:
 
 1. `llgo get` follows the Go Module to obtain the corresponding version of the Go module.
 2. Check if the pulled Go module contains `llpkg.cfg` to determine if it is a llpkg.
 3. If it is, `llgo get` need do extra things: 
-  - Run `conan install` for binaries and Store `.pc` files for building In LLPKGBINCache which is an environment variable.
+  - Run `conan install` for binaries and Store `.pc` files for building In LLGOMODCACHE which is an env variable.
   - Add a comment in the `go.mod` file indicating the original version of the corresponding C library for this llpkg and Ignore indirect dependence for now.
   ```go.mod
   require (
       github.com/google/llpkg/cjson v1.1.0  // cjson-1.7.18
   )
   ```
+
+## LLGOMODCACHE Env Variable Design
+
+One use is to store the binary `.pc` files of the C library and allow `llgo build` to find them
+
+1. official path is `{GOPATH}/llgo/pkg/mod`
+2. if GOPATH is empty, it defaults to `{HOME}/llgo/pkg/mod`
+3. `{LLGOMODCACHE}/{module_path}/{module_name}@{module_version}/` stores a binary `.pc` file of the C library corresponding to the Go Module
+
+```
+llgo get cjson@1.7.18
+
+module_path: github.com/goplus/llpkg
+module_name: cjson
+module_version: v1.1.0, mapping C library 1.7.18 to the corresponding Go Module version according to the version mapping table
+```
 
 ## Version Conversion Rules [wip]
 
