@@ -72,7 +72,7 @@ Install LLpkg process:
 
 1. `llgo get` follows the Go Module to obtain the corresponding version of the Go module.
 2. Check if the pulled Go module contains `llpkg.cfg` to determine if it is a llpkg.
-3. If it is, `llgo get` need do extra things: 
+3. If it is, `llgo get` needs to do extra things: 
   - Run `conan install` for binaries and Store `.pc` files for building In LLGOMODCACHE which is an env variable.
   - Add a comment in the `go.mod` file indicating the original version of the corresponding C library for this llpkg and Ignore indirect dependence for now.
   ```go.mod
