@@ -255,7 +255,7 @@ func main() {
 		appMode = runDemo
 	}
 
-	cfg := NewRunConfig(runPkgMode(appMode), exts, excludes)
+	cfg := NewRunConfig(runPkgMode(runMode), exts, excludes)
 
 	switch {
 	case appMode == runRand:

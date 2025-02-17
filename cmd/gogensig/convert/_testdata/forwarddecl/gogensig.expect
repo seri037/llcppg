@@ -109,17 +109,17 @@ type Context struct {
 // llgo:type C
 type Fts5ExtensionFunction func(*Fts5ExtensionApi, *Fts5Context, *Context, c.Int, **Value)
 
-type X_XmlParserCtxt struct {
+type X_xmlParserCtxt struct {
 	Unused [8]uint8
 }
-type XmlParserCtxt X_XmlParserCtxt
+type XmlParserCtxt X_xmlParserCtxt
 type HtmlParserCtxt XmlParserCtxt
 
 ===== llcppg.pub =====
 Fts5Context
 Fts5ExtensionApi
 Fts5PhraseIter
-_xmlParserCtxt X_XmlParserCtxt
+_xmlParserCtxt X_xmlParserCtxt
 bar Bar
 foo Foo
 fts5_extension_function Fts5ExtensionFunction

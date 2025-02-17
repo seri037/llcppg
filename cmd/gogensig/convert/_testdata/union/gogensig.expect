@@ -6,11 +6,11 @@ import (
 	_ "unsafe"
 )
 
-type X__U struct {
+type X__u struct {
 	B c.Long
 }
-type U X__U
+type U X__u
 
 ===== llcppg.pub =====
-__u X__U
+__u X__u
 u U

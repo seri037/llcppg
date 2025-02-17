@@ -74,30 +74,38 @@ func removePrefixedName(name string, trimPrefixes []string) string {
 	return name
 }
 
+func ToCamelCase(s string, firstPartUpper bool) string {
+	parts := strings.Split(s, "_")
+	result := []string{}
+	for i, part := range parts {
+		if i == 0 && !firstPartUpper {
+			result = append(result, part)
+			continue
+		}
+		if len(part) > 0 {
+			result = append(result, strings.ToUpper(part[:1])+part[1:])
+		}
+	}
+	return strings.Join(result, "")
+}
+
 func PubName(name string) string {
 	if len(name) == 0 {
 		return name
 	}
-	toCamelCase := func(s string) string {
-		parts := strings.Split(s, "_")
-		for i := 0; i < len(parts); i++ {
-			if len(parts[i]) > 0 {
-				parts[i] = strings.ToUpper(parts[i][:1]) + parts[i][1:]
-			}
-		}
-		return strings.Join(parts, "")
-	}
-	if name[0] == '_' {
+	fChar := name[0]
+	if fChar == '_' {
 		i := 0
 		for i < len(name) && name[i] == '_' {
 			i++
 		}
 		prefix := name[:i]
-		return "X" + prefix + toCamelCase(name[i:])
-	} else if unicode.IsDigit(rune(name[0])) {
-		return "X" + toCamelCase(name)
+		return "X" + prefix + ToCamelCase(name[i:], false)
 	}
-	return toCamelCase(name)
+	if unicode.IsDigit(rune(fChar)) {
+		return "X" + ToCamelCase(name, false)
+	}
+	return ToCamelCase(name, true)
 }
 
 // /path/to/foo.h -> foo.go
