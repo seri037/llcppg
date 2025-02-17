@@ -119,11 +119,7 @@ There are two methods for converting versions.
 
 **Rule**:
 
-`1.5.8` **cannot** be merged into `main` branch (currently tracking `1.6`). Instead:
-```bash
-git checkout <1.5.7-commit> -b cjson/1.5.x
-git cherry-pick cjson/1.5.8
-```
+`1.5.8` **cannot** be merged into `main` branch (currently tracking `1.6`). Instead, we should create a new branch and commit to it.
 
 ### Prohibition of Legacy Patch Maintenance
 
