@@ -107,6 +107,7 @@ There are two methods for converting versions.
   | **MINOR** | Non-breaking upstream updates (features/fixes). Corresponds to **any** upstream version increments in `MINOR` or `PATCH` fields. | `cjson@1.7.19` (vs `1.7.18`) → `1.1.0`; `cjson@1.8.0` → `1.2.0` |
   | **PATCH** | Internal fixes **unrelated** to upstream changes. | `llpkg@1.0.0` → `1.0.1` |
 
+  - Currently, we only consider C library updates since the first release of a llpkg.
   - Pre-release versions of C library like `v1.2.3-beta.2` would not be accepted.
   - **Note**: Please note that the version number of the llpkg is **not related** to the version number of the C library. The PATCH update of the c library will be the MINOR update of the llpkg, as the PATCH update of the llpkg is related to llpkg bug fixes.
 
