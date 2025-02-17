@@ -83,7 +83,7 @@ Install LLpkg process:
 
 ## LLGOMODCACHE Env Variable Design
 
-One use is to store the binary `.pc` files of the C library and allow `llgo build` to find them
+One usage is to store `.pc` files of the C library and allow `llgo build` to find them
 
 1. official path is `{GOPATH}/llgo/pkg/mod`
 2. if GOPATH is empty, it defaults to `{HOME}/llgo/pkg/mod`
