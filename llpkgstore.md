@@ -49,7 +49,7 @@ Recommended approach to maintain security and reproducibility:
 - Updates must be published as new versions with -patchX suffix
 - Example: `version` -> `version-patch1`
 
-## Llgo Get Usage
+## LLGo Get Usage
 
 Install LLpkg using:
 ```bash
