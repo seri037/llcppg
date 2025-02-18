@@ -155,7 +155,7 @@ A standard method for generating valid llpkgs:
 
 The title of a legacy version maintenance issue **MUST** follow the format: `Maintenance: {CLibraryName}/{Version}`.  
 
-GitHub Action will be triggered only when the issue that match this specified format closed.
+GitHub Action will be triggered only when the issue that match this specified format is closed.
 
 
 ## Version conversion rules [wip]
