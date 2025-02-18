@@ -114,7 +114,7 @@ Suggestion: Add `llgo list clib -versions` to provide user the version mapping o
 
 ## Publication via GitHub Action
 
-**Workflow**
+### Workflow
 
 1. Create PR to trigger GitHub Action
 2. PR verification
@@ -122,44 +122,41 @@ Suggestion: Add `llgo list clib -versions` to provide user the version mapping o
 4. Run test
 5. Review generated llpkg
 6. Merge PR
-7. Add a version tag by gha on main branch
+7. Add a version tag by Github Action on main branch
 
-**PR Verification Workflow**  
+### PR verification workflow
 1. Ensure that there is only one `llpkg.cfg` file across all directories. If multiple instances of `llpkg.cfg` are detected, the PR will be aborted.  
-2. Check if the directory name is valid.
+2. Check if the directory name is valid, the directory name in PR **SHOULD** equal to `Package.Name` field in the `llpkg.cfg` file.
 
-**llpkg Generation**
+**llpkg generation**
 
 A standard method for generating valid llpkgs:
 1. Receive binaries/headers from upstream, and index them into `.pc` files
 2. Automatically generate llpkg using a toolchain
 3. Debug and re-generate llpkg by modifying the configuration file
 
-**Version Tag Rule**
+**Version tag rule**
 1. Follow Go's version management for nested modules. Tag `{CLibraryName}/{MappingVersion}` for each version.
 2. This design is fully compatible with native Go modules
     ```
     github.com/goplus/llpkg/cjson@v1.7.18
     ```
 
-**Legacy Version Maintenance Workflow**  
+**Legacy version maintenance workflow**  
 
-When GitHub Actions detect that the current PR is for maintenance:  
+1. Create an issue to specify which package needs to be maintained.
+2. Discuss whether it should be maintained or not.
+3. If maintenance is decided, close the issue and add the label `maintain:{CLibraryName}/{Version}` to trigger the GitHub Action.
+4. The GitHub Action will create a branch from the `{CLibraryName}/{Version}` tag if the branch dones't exist.
+5. Create a maintenance pull request (PR) for the branch and re-run the [workflow](#workflow).
 
-- Verify if there are existing `MAJOR` and `MINOR` CLib versions.  
-- Ensure the version in the PR does not exceed the current version. If it does, the PR will be aborted. (Refer to the [Branch Maintenance Strategy](#conversion-by-mapping) for details.)  
-- If the maintenance version is lower than the `main` branch version, optionally check for an existing branch corresponding to the version; if none exists, create one. Then, update the base branch of the maintenance PR accordingly.   
-- Regenerate the module and merge with new patch tag.
 
-Example:
-Suppose we are maintaining the `clib@1.5.2` package, while the latest version in the `main` branch of `clib` is `1.6`.  
+**Issue format**
 
-In this case:  
+The title of a legacy version maintenance issue **MUST** follow the format: `Maintenance: {CLibraryName}/{Version}`.  
 
-- GitHub Actions **SHOULD** create a new branch from the `1.5.2` tag.  
-- The base branch of the PR will then be updated to the newly created branch (not the `main` branch).  
+GitHub Action will only process issues that match this specified format.
 
-This ensures the maintenance PR is aligned with the correct version instead of the latest one in the `main` branch.
 
 ## Version conversion rules [wip]
 
