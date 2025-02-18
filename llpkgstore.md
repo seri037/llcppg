@@ -107,7 +107,7 @@ Recommended approach to maintain security and reproducibility:
 
 **PR Verification Workflow**  
 1. Ensure that there is only one `llpkg.cfg` file across all directories. If multiple instances of `llpkg.cfg` are detected, the PR will be aborted.  
-2. Rename the directory in the PR to match the `package name` specified in `llpkg.cfg`.
+2. Create or Rename the directory in the PR to match the `package name` specified in `llpkg.cfg`.
 
 **LLpkg Generation**
 
