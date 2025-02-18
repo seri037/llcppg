@@ -1,6 +1,6 @@
 # LLpkg Store Documentation
 
-## LLpkg Store Directory Structure
+## Directory Structure
 
 ```
 + {CLibraryName}
@@ -89,10 +89,6 @@ Install LLpkg process:
   )
   ```
 
-
-
-
-
 ## LLpkg Generation
 
 Standardized methodology for generating compliant, reproducible LLpkgs:
@@ -112,7 +108,7 @@ llgo get github.com/goplus/llpkg/libcjson@v1.7.18
 Recommended approach to maintain security and reproducibility:
 
 **Workflow**:
-1. Validate configuration files (llpkg.cfg & *.symb.json)
+1. Validate configuration files (llpkg.cfg, llcppg.cfg, llcppg.symb.json)
 2. Create PR to trigger GitHub Action
 3. Review generated LLpkg
 4. Merge PR with version tag
@@ -159,7 +155,7 @@ There are two methods for converting versions.
 
   - Currently, we only consider C library updates since the first release of a llpkg.
   - Pre-release versions of C library like `v1.2.3-beta.2` would not be accepted.
-  - **Note**: Please note that the version number of the llpkg is **not related** to the version number of the C library. The PATCH update of the c library will be the MINOR update of the llpkg, as the PATCH update of the llpkg is related to llpkg bug fixes.
+  - **Note**: Please note that the version number of the llpkg is **not related** to the version number of the C library. It's the llpkg's MINOR update that corresponds to the C library's PATCH update, while the llpkg's PATCH update is used for indicating llpkg's self-updating.
 
 3. Branch Maintenance Strategy
 
@@ -193,7 +189,7 @@ There are two methods for converting versions.
     - ALL maintenance MUST target the **newest upstream patch version**
 
     **Rationale**:  
-    New patch updates from upstream naturally replace older fixes. Keeping old patch versions creates unnecessary differences that don't align with SemVer principles **and may leave security vulnerabilities unpatched**。
+    New patch updates from upstream naturally replace older fixes. Keeping old patch versions creates unnecessary differences that don't align with SemVer principles **and may leave security vulnerabilities unpatched**.
 
     **Workflow**:
     - cjson@1.5.8 released → llpkg MUST update from latest 1.5.x baseline (1.5.7)
@@ -278,7 +274,7 @@ One usage is to store `.pc` files of the C library and allow `llgo build` to fin
 
 1. Initialized as `${GOPATH}/llgo/pkg/mod`
 2. if GOPATH is empty, it defaults to `${HOME}/llgo/pkg/mod`
-3. `{LLGOMODCACHE}/{module_path}/{module_name}@{module_version}/` stores a binary `.pc` file of the C library corresponding to the Go Module
+3. `{LLGOMODCACHE}/{module_path}/{module_name}@{module_version}/` stores `.pc` files of C libs needed by llpkg.
 
 ```
 llgo get cjson@1.7.18
