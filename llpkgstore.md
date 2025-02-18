@@ -128,21 +128,21 @@ Suggestion: Add `llgo list clib -versions` to provide user the version mapping o
 1. Ensure that there is only one `llpkg.cfg` file across all directories. If multiple instances of `llpkg.cfg` are detected, the PR will be aborted.  
 2. Check if the directory name is valid, the directory name in PR **SHOULD** equal to `Package.Name` field in the `llpkg.cfg` file.
 
-**llpkg generation**
+### llpkg generation
 
 A standard method for generating valid llpkgs:
 1. Receive binaries/headers from [upstream](#llpkgcfg-structure), and index them into `.pc` files
 2. Automatically generate llpkg using a [toolchain](#llpkgcfg-structure)
 3. Debug and re-generate llpkg by modifying the configuration file
 
-**Version tag rule**
+### Version tag rule
 1. Follow Go's version management for nested modules. Tag `{CLibraryName}/{MappingVersion}` for each version.
 2. This design is fully compatible with native Go modules
     ```
     github.com/goplus/llpkg/cjson@v1.7.18
     ```
 
-**Legacy version maintenance workflow**  
+### Legacy version maintenance workflow
 
 1. Create an issue to specify which package needs to be maintained.
 2. Discuss whether it should be maintained or not.
@@ -151,7 +151,7 @@ A standard method for generating valid llpkgs:
 5. Create a maintenance pull request (PR) for the branch and re-run the [workflow](#workflow).
 
 
-**Issue format**
+#### Issue format
 
 The title of a legacy version maintenance issue **MUST** follow the format: `Maintenance: {CLibraryName}/{Version}`.  
 
