@@ -248,8 +248,8 @@ New patch updates from upstream naturally replace older fixes. Keeping old patch
 }
 ```
 
-- `c` represents the original C library version number.
-- `go` represents the converted version numbers.
+- `c`: the original C library version number.
+- `go`: the converted version numbers.
 
 The relationship between the original C library version number and the mapping version numbers is one-to-many, mainly due to the need to regenerate the llcppg updates.
 
