@@ -90,7 +90,6 @@ Install LLpkg process:
   ```
 
 ## Publication via GitHub Action
-Recommended approach to maintain security and reproducibility:
 
 **Workflow**:
 1. Create PR to trigger GitHub Action
