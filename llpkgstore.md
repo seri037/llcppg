@@ -147,7 +147,7 @@ A standard method for generating valid llpkgs:
 1. Create an issue to specify which package needs to be maintained.
 2. Discuss whether it should be maintained or not.
 3. If maintenance is decided, close the issue and add the label `maintain:{CLibraryName}/{Version}` to trigger the GitHub Action.
-4. The GitHub Action will create a branch from the `{CLibraryName}/{Version}` tag if the branch dones't exist.
+4. The GitHub Action will [create a branch](#rule) from the tag if the branch dones't exist.
 5. Create a maintenance pull request (PR) for the branch and re-run the [workflow](#workflow).
 
 
@@ -155,7 +155,7 @@ A standard method for generating valid llpkgs:
 
 The title of a legacy version maintenance issue **MUST** follow the format: `Maintenance: {CLibraryName}/{Version}`.  
 
-GitHub Action will only process issues that match this specified format.
+GitHub Action will be triggered only when the issue that match this specified format closed.
 
 
 ## Version conversion rules [wip]
