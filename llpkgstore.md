@@ -1,26 +1,27 @@
-# llpkg Store Documentation
+# llpkgstore documentation
 
-## Directory Structure
+## Directory structure
 
 ```
 + {CLibraryName}
    |
-   +-- {NormalGoPkgFiles}
-   |    
+   +-- {NormalGoModuleFiles}
+   |
    +-- llpkg.cfg
    |    
    +-- llcppg.cfg
    |
-   +-- .llpkg
-         |
-         +-- llcppg.symb.json
-         |
-         +-- llcppg.pub
+   +-- llcppg.symb.json
+   |
+   +-- llcppg.pub
+   |
+   +-- demo
 ```
-- `llpkg.cfg` declares essential information for llgo module.
-- `llcppg.cfg` / `llcppg.symb.json` / `llcppg.pub` customize generation behavior in llcppg tool.
 
-## llpkg.cfg Structure
+- `llpkg.cfg`: definition of an llpkg's generation workflow
+- `llcppg.cfg`, `llcppg.symb.json`, `llcppg.pub`: config files of `llcppg`
+
+## llpkg.cfg structure
 
 ```json
 {
@@ -57,66 +58,88 @@
 
   A suite of tools for generating llpkgs.
 
-## LLGo Get Usage
+## Getting an llpkg
 
-Install llpkg using:
+Use `llgo get` to get an llpkg:
+
 ```bash
 llgo get clib@cversion
+```
+
+*e.g.* `llgo get cjson@1.7.18`
+
+- `clib`: the original library name in C
+- `cversion`: the original version in C
+
+`llgo` automatically handles two things:
+
+1. Prepends required prefixes to `clib` references, converting them into valid `module_path` identifiers.
+2. Convert `cversion` to canonical `module_version` using the mapping table.
+
+Or you can use `llgo` with go module syntax directly:
+
+```bash
 llgo get module_path@module_version
 ```
 
-1. `clib` corresponds to the original library name in C, and `cversion` corresponds to the original version in C.
-2. `llgo get clib`: the module path of the C library needs to be queried from the version mapping table based on clib, which is equivalent to `llgo get module_path@latest` and retrieves the latest llpkg's Go module of clib.
-3. Suggestion: Add `llgo clist clib` to inform users of the version mapping information of clib(mapping info is generated based on llpkgstore.json).
-  ```
-  The available Go module version of this C original version:
-  format: c original version => go module versions
+*e.g.* `llgo get github.com/goplus/llpkg/cjson@v1.0.0`
 
-  1.3 => ["v0.1.0", "v1.0.1"]
-  1.3.1 => ["v1.1.0"]
-  ```
+`latest` identifier is also supported as a valid `cversion` or `module_version`. `llgo` will choose the latest version of the llpkg.
 
-Install llpkg process:
+> **Details of `llgo get`**
+>
+>  1. `llgo` automatically resolves `clib@cversion` syntax into canonical `module_path@module_version` format.
+>  2. Pull the go module by `go get`.
+>  3. Check `llpkg.cfg` to determine if it's an llpkg. If it is:
+>
+>   - Run `conan install` to install binaries. `.pc` files for building will be stored in `${LLGOMODCACHE}`.
+>   - Indicate the original `cversion` by adding a comment in `go.mod`. (We ignore indirect dependencies for now.)
+>
+>    ```go.mod
+>    require (
+>        github.com/goplus/llpkg/cjson v1.1.0  // cjson 1.7.18
+>    )
+>    ```
 
-1. `llgo get` follows the Go Module to obtain the corresponding version of the Go module.
-2. Check if the pulled Go module contains `llpkg.cfg` to determine if it is a llpkg.
-3. If it is, `llgo get` needs to do extra things: 
-  - Run `conan install` for binaries and store `.pc` files for building in `${LLGOMODCACHE}`.
-  - Add a comment in the `go.mod` file indicating the original version of the corresponding C library for this llpkg and ignore indirect dependence for now.
-  ```go.mod
-  require (
-      github.com/google/llpkg/cjson v1.1.0  // cjson-1.7.18
-  )
-  ```
+### Listing all versions [wip]
+
+Suggestion: Add `llgo list clib -versions` to provide user the version mapping of an llpkg. 
+
+```
+// cversion => module_version
+
+1.3 => ["v0.1.0", "v1.0.1"]
+1.3.1 => ["v1.1.0"]
+```
 
 ## Publication via GitHub Action
 
-**Workflow**:
+**Workflow**
+
 1. Create PR to trigger GitHub Action
-2. PR Verification
-3. llpkg Generation
-4. Review generated llpkg
-5. Merge PR with version tag
-
-
+2. PR verification
+3. llpkg generation
+4. Run test
+5. Review generated llpkg
+6. Merge PR
+7. Add a version tag by gha on main branch
 
 **PR Verification Workflow**  
 1. Ensure that there is only one `llpkg.cfg` file across all directories. If multiple instances of `llpkg.cfg` are detected, the PR will be aborted.  
-2. Create or Rename the directory in the PR to match the `package name` specified in `llpkg.cfg`.
+2. Check if the directory name is valid.
 
 **llpkg Generation**
 
-Standardized methodology for generating compliant, reproducible llpkgs:
-1. Retrieve binaries/headers from upstream and index them into a `.pc` file
-2. Automatically generate llpkg using the toolchain
+A standard method for generating valid llpkgs:
+1. Receive binaries/headers from upstream, and index them into `.pc` files
+2. Automatically generate llpkg using a toolchain
 3. Debug and re-generate llpkg by modifying the configuration file
-
 
 **Version Tag Rule**
 1. Follow Go's version management for nested modules. Tag `{CLibraryName}/{MappingVersion}` for each version.
 2. This design is fully compatible with native Go modules
     ```
-    github.com/goplus/llpkg/libcjson@v1.7.18
+    github.com/goplus/llpkg/cjson@v1.7.18
     ```
 
 **Legacy Version Maintenance Workflow**  
@@ -138,121 +161,78 @@ In this case:
 
 This ensures the maintenance PR is aligned with the correct version instead of the latest one in the `main` branch.
 
-## Version Conversion Rules [wip]
+## Version conversion rules [wip]
 
-There are two methods for converting versions.
+We use a mapping table to convert C library versions to llpkg versions.
 
-### Conversion by a formula
+### Initial version
 
-1. **Semver-compliant versions**: Use directly
-   - Example: 2.1.5 → v2.1.5
-2. **Non-Semver versions**: Convert using pattern:
-   ``` 
-   0.0.0-0-{original_version}
-   ```
-   Conversion steps:
-   1. Replace dots with hyphens
-   2. Append `0-` prefix
-   Examples:
-   - `2023Q4 → 0.0.0-0-2023Q4`
-   - `2023.07.05 → 0.0.0-0-2023-07-05`
-   - `0067 → 0.0.0-0-0067`
-
-### Conversion by mapping
-
-1. Initial Version
-
-   If the C package is stable, then start with `v1.0.0` (cjson@1.7.18)
+If the C library is stable, then start with `v1.0.0` (cjson@1.7.18)
   
-   Otherwise, start with `v0.1.0`. (libass@0.17.3)
+Otherwise, start with `v0.1.0`, until it releases a stable version. (libass@0.17.3)
   
-2. Bumping Rules
+### Bumping rules
 
-    | Component | Trigger Condition | Example |
-    |-----------|--------------------|---------|
-    | **MAJOR** | Breaking changes introduced by upstream C library updates. | `cjson@1.7.18` → `1.0.0`, `cjson@2.0` → `2.0.0` |
-    | **MINOR** | Non-breaking upstream updates (features/fixes). Corresponds to **any** upstream version increments in `MINOR` or `PATCH` fields. | `cjson@1.7.19` (vs `1.7.18`) → `1.1.0`; `cjson@1.8.0` → `1.2.0` |
-    | **PATCH** | llpkg internal fixes **unrelated** to upstream changes, or upstream patches on history versions. | `llpkg@1.0.0` → `1.0.1` |
+| Component | Trigger Condition | Example |
+|-----------|--------------------|---------|
+| **MAJOR** | Breaking changes introduced by upstream C library updates. | `cjson@1.7.18` → `1.0.0`, `cjson@2.0` → `2.0.0` |
+| **MINOR** | Non-breaking upstream updates (features/fixes). | `cjson@1.7.19` (vs `1.7.18`) → `1.1.0`; `cjson@1.8.0` → `1.2.0` |
+| **PATCH** | llpkg internal fixes **unrelated** to upstream changes, or upstream patches on history versions (see [this](#prohibition-of-legacy-patch-maintenance)). | `llpkg@1.0.0` → `1.0.1` |
 
-  - Currently, we only consider C library updates since the first release of a llpkg.
-  - Pre-release versions of C library like `v1.2.3-beta.2` would not be accepted.
-  - **Note**: Please note that the version number of the llpkg is **not related** to the version number of the C library. It's the llpkg's MINOR update that corresponds to the C library's PATCH update, while the llpkg's PATCH update is used for indicating llpkg's self-updating.
+- Currently, we only consider C library updates since the first release of an llpkg.
+- Pre-release versions of C library like `v1.2.3-beta.2` would not be accepted.
+- **Note**: Please note that the version number of the llpkg is **not related** to the version number of the C library. It's the llpkg's MINOR update that corresponds to the C library's PATCH update, while the llpkg's PATCH update is used for indicating llpkg's self-updating.
 
-3. Branch Maintenance Strategy
+### Branch maintenance strategy
 
-    **Context**:
-    - Existing repository tracks upstream `cjson@1.6` with historical versions:  
-      `cjson@1.5.7`, `cjson@1.5.6`, `cjson@1.6`.  
-    - Upstream releases `1.5.8` targeting older `1.5.x` series.
+#### Context
 
-    **Rule**:
+- Existing repository tracks upstream `cjson@1.6` with historical versions: `cjson@1.5.7`, `cjson@1.5.6`, `cjson@1.6`.  
+- Upstream releases `1.5.8` targeting older `1.5.x` series.
 
-    `1.5.8` **cannot** be merged into `main` branch (currently tracking `1.6`). Instead, we should create a new branch and commit to it.
+#### Rule
 
-4. Prohibition of Legacy Patch Maintenance
+`1.5.8` **cannot** be merged into `main` branch (currently tracking `1.6`). Instead, we should create a new branch `release-branch.cjson/v1.5` and commit to it.
 
-    **Problem Scenario**:
+### Prohibition of legacy patch maintenance
 
-    | C Library Version | llpkg Version | Issue |
-    |--------------------|---------------|-------|
-    | 1.5.1             | `1.0.0`       | Initial release |
-    | 1.5.1 (llpkg fix) | `1.0.1`       | Patch increment |
-    | 1.6               | `1.1.0`       | Minor increment |
-    | 1.5.2             | ?             | Conflict: `1.1.0` already allocated |
+#### Problem
 
-    `cjson@1.5.2` > `cjson@1.5.1` maps to `llpkg@1.0.2` < `llpkg@1.0.3` (breaking version ordering).  
-    This causes MVS to prioritize `1.0.3` (lower priority upstream version) over `1.0.2`.
+| C Library Version | llpkg Version | Issue |
+|--------------------|---------------|-------|
+| 1.5.1             | `1.0.0`       | Initial release |
+| 1.5.1 (llpkg fix) | `1.0.1`       | Patch increment |
+| 1.6               | `1.1.0`       | Minor increment |
+| 1.5.2             | ?             | Conflict: `1.1.0` already allocated |
 
-    **Conflict Resolution Rule**:  
+If we increment PATCH to `1.0.2` to represent `cjson@1.5.2`:
 
-    When upstream releases patch updates for **previous minor versions**:
-    - NO further patches shall be applied to earlier upstream patch versions
-    - ALL maintenance MUST target the **newest upstream patch version**
+| C Library Version | llpkg Version | Issue |
+|--------------------|---------------|-------|
+| 1.5.1             | `1.0.0`       | Initial release |
+| 1.5.1 (llpkg fix) | `1.0.1`       | Patch increment |
+| 1.6               | `1.1.0`       | Minor increment |
+| 1.5.2             | `1.0.2`       | Conflict: `1.1.0` already allocated |
+| 1.5.1 (llpkg fix 2) | `1.0.3`       | Patch increment |
 
-    **Rationale**:  
-    New patch updates from upstream naturally replace older fixes. Keeping old patch versions creates unnecessary differences that don't align with SemVer principles **and may leave security vulnerabilities unpatched**.
+`cjson@1.5.2` > `cjson@1.5.1` maps to `llpkg@1.0.2` < `llpkg@1.0.3` (breaking version ordering), which causes MVS to prioritize `1.0.3` (lower priority upstream version) over `1.0.2`.
 
-    **Workflow**:
-    - cjson@1.5.8 released → llpkg MUST update from latest 1.5.x baseline (1.5.7)
-    - Original cjson@1.5.1 branch becomes immutable
+#### Conflict resolution rule
 
-5. Version Mapping VS. Formula
+When upstream releases patch updates for **previous minor versions**:
+- NO further patches shall be applied to earlier upstream patch versions
+- ALL maintenance MUST target the **newest upstream patch version**
 
-    Related discussions: https://github.com/semver/semver/issues/522
+#### Rationale
 
-    **Formula**:
+New patch updates from upstream naturally replace older fixes. Keeping old patch versions creates unnecessary differences that don't align with SemVer principles **and may leave security vulnerabilities unpatched**.
 
-    Advantages:
+#### Workflow
 
-    1. Distributable and Decentralized
+- cjson@1.5.8 released → llpkg MUST update from latest 1.5.x baseline (1.5.7)
+- Original cjson@1.5.1 branch becomes immutable
 
-    2. Fully Automated
-
-    3. Simpler Engineering
-
-    Disadvantages:
-
-    1. Difficult to Define
-
-    2. Lacks Semantic Meaning
-
-    **Mapping**:
-
-    Advantages:
-
-    1. Highly Customizable
-
-    2. Precise Representation: It can be meticulously defined to represent specific API modifications.
-
-    Disadvantages:
-
-    1. Requires Manual Intervention: Version numbers must be determined manually, making it impossible to fully automate.
-
-    2. Centralized Maintenance: A mapping service must be maintained, which prevents decentralization.
-
-### Mapping File Structure
-
-We have designed the following files for mapping query conversion version numbers.
+### Mapping file structure
 
 `llpkgstore.json`:
 
@@ -260,48 +240,36 @@ We have designed the following files for mapping query conversion version number
 {
     "cgood": {
         "versions" : [{
-            "original": "1.3",
-            "converted": ["v0.1.0", "v1.0.1"]
+            "c": "1.3",
+            "go": ["v0.1.0", "v1.0.1"]
         }, 
         {
-            "original": "1.3.1",
-            "converted": ["v1.1.0"]
+            "c": "1.3.1",
+            "go": ["v1.1.0"]
         }]
     }
 }
 ```
 
-- `original` represents the original C library version number.
-- `converted` represents the converted version numbers.
+- `c` represents the original C library version number.
+- `go` represents the converted version numbers.
 
-The relationship between the original C library version number and the converted version numbers is one-to-many, mainly due to the need to regenerate the llcppg updates.
+The relationship between the original C library version number and the mapping version numbers is one-to-many, mainly due to the need to regenerate the llcppg updates.
 
-`llgo get` is expected to select the largest version from the `converted` field.
+`llgo get` is expected to select the largest version from the `go` field.
 
-
-## Web Service
+## Web service
 
 1. provide a download of the mapping table.
-2. provides a version query of the Go Module corresponding to the C library.
+2. provide a version query of the Go Module corresponding to the C library.
 
 **llpkg.goplus.org**
 
 This domain is hosted by GitHub Pages, and the `llpkgstore.json` file is located in the same branch as GitHub Pages.When running `llgo get`, it will download the file to the local `LLGOMODCACHE` which is an environment variable.
 
+## `LLGOMODCACHE`
 
-## $LLGOMODCACHE Design
+One usage is to store `.pc` files of the C library and allow `llgo build` to find them.
 
-One usage is to store `.pc` files of the C library and allow `llgo build` to find them
-
-1. Initialized as `${GOPATH}/llgo/pkg/mod`
-2. if GOPATH is empty, it defaults to `${HOME}/llgo/pkg/mod`
-3. `{LLGOMODCACHE}/{module_path}/{module_name}@{module_version}/` stores `.pc` files of C libs needed by llpkg.
-
-```
-llgo get cjson@1.7.18
-
-module_path: github.com/goplus/llpkg
-module_name: cjson
-module_version: v1.1.0, mapping C library 1.7.18 to the corresponding Go Module version according to the version mapping table
-```
-
+1. if `LLGOMODCACHE` is empty, it defaults to `${HOME}/llgo/pkg/mod`.
+2. `{LLGOMODCACHE}/{module_path}@{module_version}/pkg-config` stores `.pc` files of C libs needed by llpkg.
