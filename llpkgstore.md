@@ -248,10 +248,10 @@ New patch updates from upstream naturally replace older fixes. Keeping old patch
 }
 ```
 
-- `c`: the original C library version number.
-- `go`: the converted version numbers.
+- `c`: the original C library version.
+- `go`: the converted version.
 
-The relationship between the original C library version number and the mapping version numbers is one-to-many, mainly due to the need to regenerate the llcppg updates.
+We have to consider about the module regenerating due to [toolchain](#llpkgcfg-structure) upgrading, hence, the relationship between the original C library version and the mapping version is one-to-many.
 
 `llgo get` is expected to select the latest version from the `go` field.
 
