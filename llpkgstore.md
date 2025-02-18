@@ -253,7 +253,7 @@ New patch updates from upstream naturally replace older fixes. Keeping old patch
 
 The relationship between the original C library version number and the mapping version numbers is one-to-many, mainly due to the need to regenerate the llcppg updates.
 
-`llgo get` is expected to select the largest version from the `go` field.
+`llgo get` is expected to select the latest version from the `go` field.
 
 ## Web service
 
