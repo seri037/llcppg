@@ -89,33 +89,54 @@ Install LLpkg process:
   )
   ```
 
-## LLpkg Generation
+## Publication via GitHub Action
+
+**Workflow**:
+1. Create PR to trigger GitHub Action
+2. PR Verification
+3. LLpkg Generation
+4. Review generated LLpkg
+5. Merge PR with version tag
+
+
+
+**PR Verification Workflow**  
+1. Ensure that there is only one `llpkg.cfg` file across all directories. If multiple instances of `llpkg.cfg` are detected, the PR will be aborted.  
+2. Create or Rename the directory in the PR to match the `package name` specified in `llpkg.cfg`.
+
+**LLpkg Generation**
 
 Standardized methodology for generating compliant, reproducible LLpkgs:
 1. Retrieve binaries/headers from upstream and index them into a `.pc` file
 2. Automatically generate LLpkg using the toolchain
 3. Debug and re-generate LLpkg by modifying the configuration file
 
-### LLpkg Version Storage
 
+**Version Tag Rule**
 1. Follow Go's version management for nested modules. Tag `{CLibraryName}/{MappingVersion}` for each version.
-2. This design is fully compatible with native Go modules, enabling simple installation via:
-```bash
-llgo get github.com/goplus/llpkg/libcjson@v1.7.18
-```
+2. This design is fully compatible with native Go modules
+    ```
+    github.com/goplus/llpkg/libcjson@v1.7.18
+    ```
 
-### Publication via GitHub Action
-Recommended approach to maintain security and reproducibility:
+**Legacy Version Maintenance Workflow**  
 
-**Workflow**:
-1. Validate configuration files (llpkg.cfg, llcppg.cfg, llcppg.symb.json)
-2. Create PR to trigger GitHub Action
-3. Review generated LLpkg
-4. Merge PR with version tag
+When GitHub Actions detect that the current PR is for maintenance:  
 
-**Maintenance**:
-- Updates must be published as new versions with -patchX suffix
-- Example: `version` -> `version-patch1`
+- Verify if there are existing `MAJOR` and `MINOR` CLib versions.  
+- Ensure the version in the PR does not exceed the current version. If it does, the PR will be aborted. (Refer to the [Branch Maintenance Strategy](#conversion-by-mapping) for details.)  
+- If the maintenance version is lower than the `main` branch version, optionally check for an existing branch corresponding to the version; if none exists, create one. Then, update the base branch of the maintenance PR accordingly.   
+- Regenerate the module and merge with new patch tag.
+
+Example:
+Suppose we are maintaining the `clib@1.5.2` package, while the latest version in the `main` branch of `clib` is `1.6`.  
+
+In this case:  
+
+- GitHub Actions **SHOULD** create a new branch from the `1.5.2` tag.  
+- The base branch of the PR will then be updated to the newly created branch (not the `main` branch).  
+
+This ensures the maintenance PR is aligned with the correct version instead of the latest one in the `main` branch.
 
 ## Version Conversion Rules [wip]
 
