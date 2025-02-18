@@ -131,8 +131,8 @@ Suggestion: Add `llgo list clib -versions` to provide user the version mapping o
 **llpkg generation**
 
 A standard method for generating valid llpkgs:
-1. Receive binaries/headers from upstream, and index them into `.pc` files
-2. Automatically generate llpkg using a toolchain
+1. Receive binaries/headers from [upstream](#llpkgcfg-structure), and index them into `.pc` files
+2. Automatically generate llpkg using a [toolchain](#llpkgcfg-structure)
 3. Debug and re-generate llpkg by modifying the configuration file
 
 **Version tag rule**
