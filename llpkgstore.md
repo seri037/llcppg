@@ -149,8 +149,9 @@ The optional `latest` identifier is also supported as a valid `cversion` or `mod
 
 A standard method for generating valid llpkgs:
 1. Receive binaries/headers from [upstream](#llpkgcfg-structure), and index them into `.pc` files
-2. Automatically generate llpkg using a [toolchain](#llpkgcfg-structure)
-3. Debug and re-generate llpkg by modifying the configuration file
+2. Automatically generate llpkg using a [toolchain](#llpkgcfg-structure) for different platforms
+3. Combine generated results into one Go module
+4. Debug and re-generate llpkg by modifying the configuration file
 
 ### Version tag rule
 1. Follow Go's version management for nested modules. Tag `{CLibraryName}/{MappingVersion}` for each version.
