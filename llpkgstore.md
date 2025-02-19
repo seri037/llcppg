@@ -254,7 +254,7 @@ New patch updates from upstream naturally replace older fixes. Keeping old patch
     "cgood": {
         "versions" : [{
             "c": "1.3",
-            "go": ["v0.1.0", "v1.0.1"]
+            "go": ["v0.1.0", "v0.1.1"]
         }, 
         {
             "c": "1.3.1",
