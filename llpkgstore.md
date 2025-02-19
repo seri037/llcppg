@@ -15,11 +15,24 @@
    |
    +-- llcppg.pub
    |
-   +-- demo
+   +-- _demo
+         |
+         +-- {DemoName1}
+         |       |
+         |       +-- main.go
+         |       |
+         |       +-- {OptionalSubPkgs}
+         |
+         +-- {DemoName2}
+         |       |
+         |       +-- ...
+         |
+         +-- ...
 ```
 
 - `llpkg.cfg`: definition of an llpkg's generation workflow
 - `llcppg.cfg`, `llcppg.symb.json`, `llcppg.pub`: config files of `llcppg`
+- `_demo`: tests to verify if llpkg can be imported, compiled and run as expected.
 
 ## llpkg.cfg Structure
 
