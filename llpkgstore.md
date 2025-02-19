@@ -25,18 +25,17 @@
 
 ```json
 {
-  "package": {
-    "name": "cjson",
-    "cVersion": "1.7.18",
-    "moduleVersion": "v1.0.0"
-  },
   "upstream": {
-    "name": "conan",
+    "installer": "conan",
     "config": {
       "options": ""
+    },
+    "package": {
+      "name": "cjson",
+      "version": "1.7.18",
     }
   },
-  "toolchain": {
+  "generator": {
     "name": "llcppg",
     "version": "0.9.7"
   }
@@ -274,10 +273,19 @@ We have to consider about the module regenerating due to [toolchain](#llpkgcfg-s
 
 ## llpkg.goplus.org
 
+This domain is hosted by GitHub Pages, and the `llpkgstore.json` file is located in the same branch as GitHub Pages. When running `llgo get`, it will download the file to `LLGOMODCACHE`.
+
+### Function
+
 1. Provide a download of the mapping table.
 2. Provide a version query of the Go Module corresponding to the C library.
 
-This domain is hosted by GitHub Pages, and the `llpkgstore.json` file is located in the same branch as GitHub Pages. When running `llgo get`, it will download the file to `LLGOMODCACHE`.
+### Style
+
+### Router
+
+### Interaction with web service
+
 
 ## `LLGOMODCACHE`
 
