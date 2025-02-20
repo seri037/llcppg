@@ -206,7 +206,7 @@ A standard method for generating valid llpkgs:
     ```
 
 ### `{MappedVersion}` in PR commit
-`{MappedVersion}` **MUST** be included in the footer of the latest commit in the current PR and must follow this format:  
+`{MappedVersion}` **MUST** be included in the PR's latest commit, and **MUST** follow the format:  
 
 ```
 Commit-as: {MappedVersion}
