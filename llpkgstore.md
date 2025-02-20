@@ -286,19 +286,31 @@ We have to consider about the module regenerating due to [toolchain](#llpkgcfg-s
 
 ## llpkg.goplus.org
 
-This domain is hosted by GitHub Pages, and the `llpkgstore.json` file is located in the same branch as GitHub Pages. When running `llgo get`, it will download the file to `LLGOMODCACHE`.
+This service is hosted by GitHub Pages, and the `llpkgstore.json` file is located in the same branch as GitHub Pages. When running `llgo get`, it will download the file to `LLGOMODCACHE`.
 
 ### Function
 
 1. Provide a download of the mapping table.
-2. Provide a version query of the Go Module corresponding to the C library.
-
-### Style
+2. Provide version queries for Go Modules corresponding to C libraries.
+3. Provide links to specific C libraries on Conan.io.
+4. Preview the structure of `llpkg.cfg`.
 
 ### Router
 
+1. `/`: Home page with a search bar at the top and multiple llpkgs. Users can search for llpkgs by name and view the latest two versions. Clicking an llpkg opens a modal displaying:
+   - Information about the original C library on Conan
+   - A preview of its `llpkg.cfg`
+   - All available versions of the llpkg
+2. `/versions.json`: Provides the mapping table download.
+
+**Note**: llpkg details are displayed in modals instead of new pages, as `versions.json` is loaded during the initial homepage access and does not require additional requests.
+
 ### Interaction with web service
 
+When executing `llgo get clib@cversion`, the tool will:
+1. Fetch latest `versions.json`
+2. Convert `cversion` to `module_version` according to the mapping table
+3. Download the specific llpkg files for the matched cversion
 
 ## `LLGOMODCACHE`
 
