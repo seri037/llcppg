@@ -74,6 +74,7 @@
 | version | `string` | "latest" | ✅ | generator version |
 #### For developers
 
+When you specify a version of a C library, we will check the corresponding upstream platform to see if the version is supported. If the version is not found, the CLI will provide you with an opportunity to reselect a version supported by the current upstream platform.
 
 **IMPORTANT**: For automated workflows, if an incorrect version is chosen and there is no user intervention (i.e., no input in the CLI's stdin), an error will be automatically thrown and the process will terminate after a timeout (usually 5 seconds).
 
@@ -86,6 +87,7 @@ For C/C++, the only supported generator is llcppg.
 At the moment, we heavily rely on Conan as the upstream distribution platform for C libraries. Therefore, Conan is the only installer supported for C libraries. This field exists for better extensibility and a possible situation that Conan's service might be unavailable in the future. We have planned to introduce more distribution platforms in the future to provide broader coverage.  
 
 
+During the development and debugging phase, any changes made to the original configuration file will be displayed in the final output (stdout). Before proceeding, the CLI will prompt you to confirm whether you want to save the modified version locally.
 
 ## Getting an llpkg
 
