@@ -220,7 +220,6 @@ git commit -m "feat: add cjson" -m "Commit-as: v1.0.0"
 git merge
 ```
 
-
 ### Legacy version maintenance workflow
 
 1. Create an issue to specify which package needs to be maintained.
