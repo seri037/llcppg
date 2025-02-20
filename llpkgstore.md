@@ -295,8 +295,8 @@ This service is hosted by GitHub Pages, and the `llpkgstore.json` file is locate
 ### Interaction with web service
 
 When executing `llgo get clib@cversion`, the tool will:
-1. Download `versions.json`
-2. Parse it to find matching entries
+1. Fetch latest `versions.json`
+2. Convert `cversion` to `module_version` according to the mapping table
 3. Download the specific llpkg files for the matched cversion
 
 ## `LLGOMODCACHE`
