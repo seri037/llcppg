@@ -323,13 +323,11 @@ This service is hosted by GitHub Pages, and the `llpkgstore.json` file is locate
 1. Provide a download of the mapping table.
 2. Provide version queries for Go Modules corresponding to C libraries.
 3. Provide links to specific C libraries on Conan.io.
-4. Preview the structure of `llpkg.cfg`.
 
 ### Router
 
 1. `/`: Home page with a search bar at the top and multiple llpkgs. Users can search for llpkgs by name and view the latest two versions. Clicking an llpkg opens a modal displaying:
    - Information about the original C library on Conan
-   - A preview of its `llpkg.cfg`
    - All available versions of the llpkg
 2. `/llpkgstore.json`: Provides the mapping table download.
 
