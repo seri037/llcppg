@@ -144,13 +144,33 @@ The way `llgo get` handles the version number  after '@' is determined by the fo
 >       )
 >       ```
 
-## Listing clib version mapping [wip]
+## Listing clib version mapping
+ 
+This command `llgo list -m -versions clib`,  provides user the version mapping of an llpkg and is compatible with `go list`. 
 
-`llgo list clib -versions` to provide user the version mapping of an llpkg. 
+*e.g.* `llgo list -m -versions cjson`:
 
 ```
-1.3 => ["v0.1.0", "v1.0.1"]
-1.3.1 => ["v1.1.0"]
+module_path=github.com/goplus/llpkg/cjson 
+1.3=v0.1.0
+1.3=v1.0.1
+1.3.1=v1.1.0
+```
+
+*e.g.* `llgo list -m -versions -json cjson`:
+
+```json
+{
+  "CVersion": "1.7.18",
+  "Mapping" : [{
+      "C": "1.3",
+      "Go": ["v0.1.0", "v0.1.1"]
+  },
+  {
+      "C": "1.3.1",
+      "Go": ["v1.1.0"]
+  }]
+}
 ```
 
 ## Publication via GitHub Action
