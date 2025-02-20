@@ -273,7 +273,7 @@ git merge
 
 ### Post-processing Github Action
 
-GitHub Action pushes a tag following the [Version Tag Rule](#version-tag-rule).
+Post-processing GitHub Action will tag the commit following the [Version Tag Rule](#version-tag-rule).
 
 ### Legacy version maintenance workflow
 
