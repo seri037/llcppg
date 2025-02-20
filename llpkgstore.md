@@ -191,15 +191,15 @@ Or you can also view the info in json format.
 
 ```go
 type VersionMapping struct {
-  CLibVersion  string   `json:"c"`
-  GoModuleVersion []string `json:"go"`
+  CLibVersion  string
+  GoModuleVersions []string
 }
 
 type LLPkg struct {
-  GoModule         Module           `json:"gomodule"`
-  CLibVersion      string           `json:"cversion"`
-  VersionMappings  []VersionMapping `json:"versions"`
-} `json:"llpkg"`
+  GoModule         Module  // refer to https://go.dev/ref/mod#go-list-m
+  CLibVersion      string
+  VersionMappings  []VersionMapping
+}
 ```
 
 ```json
