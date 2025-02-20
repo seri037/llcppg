@@ -204,11 +204,26 @@ type LLPkg struct {
 
 ```json
 {
-  "llpkg": {
-    "gomodule": {}, // refer to https://go.dev/ref/mod#go-list-m
-    "cversion": ,
-    "versions": 
+{   
+  "LLPkg":{
+    "GoModule": {
+      "Path": "github.com/goplus/llpkg/cjson",
+      "Version": "v0.1.0",
+      "Time": "2025-02-10T16:11:33Z",
+      "Indirect": false,
+      "GoVersion": "1.21"
+    },
+    "CLibVersion": "1.7.18",
+    "VersionMappings": [{
+      "CLibVersion": "1.7.18",
+      "GoModuleVersions": ["v0.1.0", "v0.1.1"]
+    },
+    {
+      "CLibVersion": "1.7.19",
+      "GoModuleVersions": ["v0.2.0"]
+    }]
   }
+}
 }
 ```
 
