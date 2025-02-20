@@ -153,7 +153,7 @@ llgo list -m [-versions] [-json] [clibs/modules]
 - `clibs`: a set of space-separated clib[@cversion]
 - `modules`: a set of space-separated module_path[@module_version]
  
-When using `clibs`, it provides user the version mapping of an llpkg.
+You can use `clibs` as the argument. It'll print the module path and the current version mapping.
 
 *e.g.* `llgo list -m cjson`:
 
