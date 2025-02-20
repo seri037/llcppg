@@ -116,7 +116,7 @@ llgo get clib[@latest]
 llgo get module_path[@latest]
 ```
 
-The optional `latest` identifier is supported as a valid `cversion` or `module_version`. When `llgo get clib@latest`, The process first converts `clib` to `module_path`, which is then converted to `llgo get module_path@latest`. llgo will find the latest llpkg and pull it.
+The optional `latest` identifier is supported as a valid `cversion` or `module_version`. When `llgo get clib@latest`, `llgo get` will firstly convert `clib` to `module_path`, and then process it as `module_path@latest`. `llgo get` will find the latest llpkg and pull it.
 
 Wrong usage:
 
@@ -125,8 +125,7 @@ llgo get clib@module_version
 llgo get module_path@cversion
 ```
 
-The way `llgo get` handles the version number  after '@' is determined by the format of the content before '@'. For example, if it is a clib, it will be processed as `clib@cversion`; otherwise, it will be processed as `module_path@module_version`. This is to prevent the possibility that cversion and module_version might be the same.
-
+It's the format of the part before `@` that determines the how `llgo get` will handle the version; that is, `llgo get` will firstly check if it's a `clib`. If it is, the whole argument will be processed as `clib@cversion`; otherwise, it will be processed as `module_path@module_version`.
 
 > **Details of `llgo get`**
 >
@@ -146,15 +145,15 @@ The way `llgo get` handles the version number  after '@' is determined by the fo
 
 ## Listing clib version mapping
  
-This command `llgo list -m -versions clib`,  provides user the version mapping of an llpkg and is compatible with `go list`. 
+The command, `llgo list -m -versions clib`, provides user the version mapping of an llpkg, and is compatible with `go list`.
 
 *e.g.* `llgo list -m -versions cjson`:
 
 ```
 module_path=github.com/goplus/llpkg/cjson 
 1.3=v0.1.0
-1.3=v1.0.1
-1.3.1=v1.1.0
+1.3=v0.1.1
+1.3.1=v0.2.0
 ```
 
 *e.g.* `llgo list -m -versions -json cjson`:
@@ -168,7 +167,7 @@ module_path=github.com/goplus/llpkg/cjson
   },
   {
       "C": "1.3.1",
-      "Go": ["v1.1.0"]
+      "Go": ["v0.2.0"]
   }]
 }
 ```
