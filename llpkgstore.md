@@ -57,33 +57,31 @@
 
 ### Field description
 
-**package**
-
-| key         | type    | default value   | optional | meaning           |
-| -------------- | ------- | -------- | -------- | -------------- |
-| name           | `string`  |        | ❌       | package name       |
-| cVersion        | `string`  | \<latest\>       | ✅       | original c package version    |
-| moduleVersion | `string` |  v1.0.0  | ✅ | llgo module version |
-
 **upstream**
 
-| key         | type    | default value   | optional | meaning           |
-| -------------- | ------- | -------- | -------- | -------------- |
-| name           | `string`  | "conan"       | ✅       | upstream package platform   |
-| config        | `map[string]string`  | []       | ✅       | platform CLI option |
+| key | type | defaultValue | optional | description |
+|------|------|--------|------|------|
+| installer | `string` | "conan" | ✅ | upstream binary provider |
+| config | `map[string]string` | [] | ✅ | config of installer |
+| package.name | `string` | - | ❌ | package name in platform |
+| package.version | `string` | - | ❌ | original package version |
 
-**toolchain**
+**generator** 
 
-| key         | type    | default value   | optional | meaning           |
-| -------------- | ------- | -------- | -------- | -------------- |
-| name           | `string`  | "llcppg"       | ✅       | toolchain name  |
-| version        | `string`  | "latest" | ✅       | toolchain version   |
+| key | type | defaultValue | optional | description |
+|------|------|--------|------|------|
+| name | `string` | "llcppg" | ✅ | generator name |
+| version | `string` | "latest" | ✅ | generator version |
 
 #### For developers
 
-If no `cVersion` is specified, the `conan search` command will be used to fetch all available versions of the current C package. You can then manually select the version from the command line.
+**Currently**, the cfg system supports third-party libraries for C/C++ **only**. Support for other languages, such as Python and Rust, may be added in the future, but there are no updates at this time. 
 
-If no `moduleVersion` is specified, it will **currently** default to `v1.0.0`. This may cause conflicts with existing tags in the current repository. Please better fill it by yourself.
+For C/C++, the only supported generator is llcppg. 
+
+**IMPORTANT**: llcppg is still in development and does not have strict versioning, so it is recommended to use `latest` as the default value for configuration.
+
+At the moment, we heavily rely on Conan as the upstream distribution platform for C libraries. Therefore, Conan is the only installer supported for C libraries. This field exists for better extensibility and a possible situation that Conan's service might be unavailable in the future. We have planned to introduce more distribution platforms in the future to provide broader coverage.  
 
 ## Getting an llpkg
 
