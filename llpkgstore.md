@@ -161,6 +161,7 @@ You can use `clibs` as the argument. It'll print the module path and the current
 github.com/goplus/llpkg/cjson 1.3/v0.1.1
 
 ```
+Add `-versions` to check all version mappings of the llpkg.
 
 *e.g.* `llgo list -m -versions cjson`:
 
