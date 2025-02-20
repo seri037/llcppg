@@ -331,16 +331,17 @@ This service is hosted by GitHub Pages, and the `llpkgstore.json` file is locate
    - Information about the original C library on Conan
    - A preview of its `llpkg.cfg`
    - All available versions of the llpkg
-2. `/versions.json`: Provides the mapping table download.
+2. `/llpkgstore.json`: Provides the mapping table download.
 
-**Note**: llpkg details are displayed in modals instead of new pages, as `versions.json` is loaded during the initial homepage access and does not require additional requests.
+**Note**: llpkg details are displayed in modals instead of new pages, as `llpkgstore.json` is loaded during the initial homepage access and does not require additional requests.
 
 ### Interaction with web service
 
-When executing `llgo get clib@cversion`, the tool will:
-1. Fetch latest `versions.json`
-2. Convert `cversion` to `module_version` according to the mapping table
-3. Download the specific llpkg files for the matched cversion
+When executing `llgo get clib@cversion`, a series of actions will be performed to convert `cversion` to `module_version`:
+1. Fetch the latest `llpkgstore.json`
+2. Parse the JSON file to find the corresponding `module_version` array
+3. Select the latest patched version from the array
+3. Retrieve llpkg
 
 ## `LLGOMODCACHE`
 
