@@ -144,31 +144,86 @@ It's the format of the part before `@` that determines the how `llgo get` will h
 >       ```
 
 ## Listing clib version mapping
+
+```
+llgo list -m [-versions] [-json] [clibs/modules]
+```
+
+- `llgo list -m` is compatible with `go list -m`
+- `clibs`: a set of space-separated clib[@cversion]
+- `modules`: a set of space-separated module_path[@module_version]
  
-The command, `llgo list -m -versions clib`, provides user the version mapping of an llpkg, and is compatible with `go list`.
+You can use `clibs` as the argument. It'll print the module path and the current version mapping.
+
+*e.g.* `llgo list -m cjson`:
+
+```
+github.com/goplus/llpkg/cjson 1.3/v0.1.1
+```
+Add `-versions` to check all version mappings of the llpkg.
 
 *e.g.* `llgo list -m -versions cjson`:
 
 ```
-module_path=github.com/goplus/llpkg/cjson 
-1.3=v0.1.0
-1.3=v0.1.1
-1.3.1=v0.2.0
+github.com/goplus/llpkg/cjson 1.3/[v0.1.0 v0.1.1] 1.3.1/[v0.2.0]
 ```
+
+When using `modules`, it follows the results of `go list`.
+
+*e.g.* `llgo list -m -versions github.com/goplus/llpkg/cjson`:
+
+```
+github.com/goplus/llpkg/cjson v0.1.0 v0.1.1 v0.2.0
+```
+
+You can also use both of them in one command.
+
+*e.g.* `llgo list -m -versions cjson github.com/goplus/llpkg/cjson`:
+
+```
+github.com/goplus/llpkg/cjson 1.3/[v0.1.0 v0.1.1] 1.3.1/[v0.2.0]
+github.com/goplus/llpkg/cjson v0.1.0 v0.1.1 v0.2.0
+```
+
+Or you can also view the info in json format.
 
 *e.g.* `llgo list -m -versions -json cjson`:
 
+```go
+type VersionMapping struct {
+  CLibVersion  string
+  GoModuleVersions []string
+}
+
+type LLPkg struct {
+  GoModule         Module  // refer to https://go.dev/ref/mod#go-list-m
+  CLibVersion      string
+  VersionMappings  []VersionMapping
+}
+```
+
 ```json
 {
-  "CVersion": "1.7.18",
-  "Mapping" : [{
-      "C": "1.3",
-      "Go": ["v0.1.0", "v0.1.1"]
-  },
-  {
-      "C": "1.3.1",
-      "Go": ["v0.2.0"]
-  }]
+{   
+  "LLPkg":{
+    "GoModule": {
+      "Path": "github.com/goplus/llpkg/cjson",
+      "Version": "v0.1.0",
+      "Time": "2025-02-10T16:11:33Z",
+      "Indirect": false,
+      "GoVersion": "1.21"
+    },
+    "CLibVersion": "1.7.18",
+    "VersionMappings": [{
+      "CLibVersion": "1.7.18",
+      "GoModuleVersions": ["v0.1.0", "v0.1.1"]
+    },
+    {
+      "CLibVersion": "1.7.19",
+      "GoModuleVersions": ["v0.2.0"]
+    }]
+  }
+}
 }
 ```
 
