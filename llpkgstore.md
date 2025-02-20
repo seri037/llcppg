@@ -284,7 +284,6 @@ Post-processing GitHub Action will tag the commit following the [Version Tag Rul
 5. When issues labeled with `branch:release-branch.` are closed, we need to determine whether to remove the branch. In the following case, the branch and label can be safely removed:  
    - No commit contains `fix* {ThisCommitID}`.(* means the commit starting with `fix` prefix)
 
-
 ## Version conversion rules [wip]
 
 We use a mapping table to convert C library versions to llpkg versions.
