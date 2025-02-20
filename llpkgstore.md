@@ -192,8 +192,8 @@ module_path=github.com/goplus/llpkg/cjson
 ### llpkg generation
 
 A standard method for generating valid llpkgs:
-1. Receive binaries/headers from [upstream](#llpkgcfg-structure), and index them into `.pc` files
-2. Automatically generate llpkg using a [toolchain](#llpkgcfg-structure) for different platforms
+1. Receive binaries/headers from [installer](#llpkgcfg-structure), and index them into `.pc` files
+2. Automatically generate llpkg using a [generator](#llpkgcfg-structure) for different platforms
 3. Combine generated results into one Go module
 4. Debug and re-generate llpkg by modifying the configuration file
 
@@ -328,7 +328,7 @@ New patch updates from upstream naturally replace older fixes. Keeping old patch
 - `c`: the original C library version.
 - `go`: the converted version.
 
-We have to consider about the module regenerating due to [toolchain](#llpkgcfg-structure) upgrading, hence, the relationship between the original C library version and the mapping version is one-to-many.
+We have to consider about the module regenerating due to [generator](#llpkgcfg-structure) upgrading, hence, the relationship between the original C library version and the mapping version is one-to-many.
 
 `llgo get` is expected to select the latest version from the `go` field.
 
