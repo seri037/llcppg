@@ -98,7 +98,7 @@ llgo get clib@cversion
 - `clib`: the original library name in C
 - `cversion`: the original version in C
 
-`llgo` automatically handles two things:
+`llgo get` automatically handles two things:
 
 1. Prepends required prefixes to `clib` references, converting them into valid `module_path` identifiers.
 2. Convert `cversion` to canonical `module_version` using the version mapping table.
@@ -116,7 +116,16 @@ llgo get clib[@latest]
 llgo get module_path[@latest]
 ```
 
-The optional `latest` identifier is also supported as a valid `cversion` or `module_version`. When `llgo get clib@latest`, llgo will find the latest llpkg corresponding to clib and pull it.
+The optional `latest` identifier is supported as a valid `cversion` or `module_version`. When `llgo get clib@latest`, `llgo get` will firstly convert `clib` to `module_path`, and then process it as `module_path@latest`. `llgo get` will find the latest llpkg and pull it.
+
+Wrong usage:
+
+```bash
+llgo get clib@module_version
+llgo get module_path@cversion
+```
+
+It's the format of the part before `@` that determines the how `llgo get` will handle the version; that is, `llgo get` will firstly check if it's a `clib`. If it is, the whole argument will be processed as `clib@cversion`; otherwise, it will be processed as `module_path@module_version`.
 
 > **Details of `llgo get`**
 >
@@ -124,22 +133,43 @@ The optional `latest` identifier is also supported as a valid `cversion` or `mod
 >  2. Pull the go module by `go get`.
 >  3. Check `llpkg.cfg` to determine if it's an llpkg. If it is:
 >
->   - Run `conan install` to install binaries. `.pc` files for building will be stored in `${LLGOMODCACHE}`.
->   - Indicate the original `cversion` by adding a comment in `go.mod`. (We ignore indirect dependencies for now.)
+>     - Run `conan install` to install binaries. `.pc` files for building will be stored in `${LLGOMODCACHE}`.
+>     - Indicate the original `cversion` by adding a comment in `go.mod`. (We ignore indirect dependencies for now.)
 >
->    ```go.mod
->    require (
->        github.com/goplus/llpkg/cjson v1.1.0  // cjson 1.7.18
->    )
->    ```
+>       ```
+>       // go.mod 
+>       require (
+>             github.com/goplus/llpkg/cjson v1.1.0  // cjson 1.7.18
+>       )
+>       ```
 
-## Listing clib version mapping [wip]
+## Listing clib version mapping
+ 
+The command, `llgo list -m -versions clib`, provides user the version mapping of an llpkg, and is compatible with `go list`.
 
-`llgo list clib -versions` to provide user the version mapping of an llpkg. 
+*e.g.* `llgo list -m -versions cjson`:
 
 ```
-1.3 => ["v0.1.0", "v1.0.1"]
-1.3.1 => ["v1.1.0"]
+module_path=github.com/goplus/llpkg/cjson 
+1.3=v0.1.0
+1.3=v0.1.1
+1.3.1=v0.2.0
+```
+
+*e.g.* `llgo list -m -versions -json cjson`:
+
+```json
+{
+  "CVersion": "1.7.18",
+  "Mapping" : [{
+      "C": "1.3",
+      "Go": ["v0.1.0", "v0.1.1"]
+  },
+  {
+      "C": "1.3.1",
+      "Go": ["v0.2.0"]
+  }]
+}
 ```
 
 ## Publication via GitHub Action
