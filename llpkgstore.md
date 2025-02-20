@@ -233,7 +233,7 @@ type LLPkg struct {
 4. Run test
 5. Review generated llpkg
 6. Merge PR
-7. Add a version tag by Github Action on main branch
+7. Run post-processing Github Action on main branch
 
 ### PR verification workflow
 1. Ensure that there is only one `llpkg.cfg` file across all directories. If multiple instances of `llpkg.cfg` are detected, the PR will be aborted.  
@@ -271,19 +271,19 @@ git commit -m "feat: add cjson" -m "Commit-as: v1.0.0"
 git merge
 ```
 
+### Post-processing Github Action
+
+GitHub Action pushes a tag following the [Version Tag Rule](#version-tag-rule).
+
 ### Legacy version maintenance workflow
 
-1. Create an issue to specify which package needs to be maintained.
-2. Discuss whether it should be maintained or not.
-3. If maintenance is decided, close the issue and add the label `maintain:{CLibraryName}/{Version}` to trigger the GitHub Action.
-4. The GitHub Action will [create a branch](#rule) from the tag if the branch dones't exist.
-5. Create a maintenance pull request (PR) for the branch and re-run the [workflow](#workflow).
+1. Create an issue to discuss the package that requires maintenance.  
+2. The maintainer creates a label in the format `branch:release-branch.{CLibraryName}/{MappedVersion}` and adds it to the issue if the package needs maintenance.  
+3. A GitHub Action is triggered when the label is created. It searches for issues with the specified label and determines whether a branch should be created based on the [Branch Maintenance Strategy](#branch-maintenance-strategy).  
+4. Open a pull request (PR) for maintenance. The maintainer **SHOULD** merge the PR with the commit message `fixed {CommitID}` to close the related issue.  
+5. When issues labeled with `branch:release-branch.` are closed, we need to determine whether to remove the branch. In the following case, the branch and label can be safely removed:  
+   - No commit contains `fix* {ThisCommitID}`.(* means the commit starting with `fix` prefix)
 
-#### Issue format
-
-The title of a legacy version maintenance issue **MUST** follow the format: `Maintenance: {CLibraryName}/{Version}`.  
-
-GitHub Action will be triggered only when the issue that match this specified format is closed.
 
 ## Version conversion rules [wip]
 
