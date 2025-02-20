@@ -74,8 +74,6 @@
 | version | `string` | "latest" | ✅ | generator version |
 #### For developers
 
-When you specify a version of a C library, we will check the corresponding upstream platform to see if the version is supported. If the version is not found, the CLI will provide you with an opportunity to reselect a version supported by the current upstream platform.
-
 **IMPORTANT**: For automated workflows, if an incorrect version is chosen and there is no user intervention (i.e., no input in the CLI's stdin), an error will be automatically thrown and the process will terminate after a timeout (usually 5 seconds).
 
 **Currently**, the cfg system supports third-party libraries for C/C++ **only**. Support for other languages, such as Python and Rust, may be added in the future, but there are no updates at this time. 
