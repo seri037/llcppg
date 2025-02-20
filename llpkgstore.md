@@ -165,7 +165,7 @@ Add `-versions` to check all version mappings of the llpkg.
 *e.g.* `llgo list -m -versions cjson`:
 
 ```
-github.com/goplus/llpkg/cjson 1.3/{v0.1.0 v0.1.1} 1.3.1/{v0.2.0}
+github.com/goplus/llpkg/cjson 1.3/[v0.1.0 v0.1.1] 1.3.1/[v0.2.0]
 ```
 
 When using `modules`, it follows the results of `go list`.
