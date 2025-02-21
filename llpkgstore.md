@@ -399,7 +399,12 @@ This service is hosted by GitHub Pages, and the `llpkgstore.json` file is locate
 1. `/`: Home page with a search bar at the top and multiple llpkgs. Users can search for llpkgs by name and view the latest two versions. Clicking an llpkg opens a modal displaying:
    - Information about the original C library on Conan
    - All available versions of the llpkg
+
+  ![Index](./docs/llpkg_index.svg)
+
 2. `/llpkgstore.json`: Provides the mapping table download.
+
+  ![Pkg detail](./docs/llpkg_pkg.svg)
 
 **Note**: llpkg details are displayed in modals instead of new pages, as `llpkgstore.json` is loaded during the initial homepage access and does not require additional requests.
 
