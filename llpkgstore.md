@@ -64,7 +64,7 @@
 | key | type | defaultValue | optional | description |
 |------|------|--------|------|------|
 | installer.name | `string` | "conan" | ✅ | upstream binary provider |
-| installer.config | `map[string]string` | {} | ✅ | config of installer |、
+| installer.config | `map[string]string` | {} | ✅ | config of installer |
 | package.name | `string` | - | ❌ | package name in platform |
 | package.version | `string` | - | ❌ | original package version |
 
