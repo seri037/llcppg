@@ -156,19 +156,29 @@ llgo list -m [-versions] [-json] [clibs/modules]
 - `clibs`: a set of space-separated clib[@cversion]
 - `modules`: a set of space-separated module_path[@module_version]
  
-You can use `clibs` as the argument. It'll print the module path and the current version mapping.
+You can use `clibs` as the argument. It'll print the module path and the upstreams of the local llpkg according to `go.mod` and `llpkg.cfg`.
 
 *e.g.* `llgo list -m cjson`:
 
 ```
-github.com/goplus/llpkg/cjson 1.3/v0.1.1
+github.com/goplus/llpkg/cjson v0.1.0[conan:cjson/1.7.18]
 ```
-Add `-versions` to check all version mappings of the llpkg.
+
+You can also use `module_path` as the argument, it will act the same as `go list -m`.
+
+*e.g.* `llgo list -m github.com/goplus/llpkg/cjson`:
+
+```
+github.com/goplus/llpkg/cjson v0.1.0
+```
+
+
+Add `-versions` to check all version mappings of a llpkg.
 
 *e.g.* `llgo list -m -versions cjson`:
 
 ```
-github.com/goplus/llpkg/cjson 1.3/[v0.1.0,v0.1.1] 1.3.1/[v0.2.0]
+github.com/goplus/llpkg/cjson v0.1.0[1.7.18] v0.1.1[1.7.18] v0.2.0[1.7.19]
 ```
 
 When using `modules`, it follows the results of `go list`.
@@ -184,7 +194,7 @@ You can also use both of them in one command.
 *e.g.* `llgo list -m -versions cjson github.com/goplus/llpkg/cjson`:
 
 ```
-github.com/goplus/llpkg/cjson 1.3/[v0.1.0,v0.1.1] 1.3.1/[v0.2.0]
+github.com/goplus/llpkg/cjson v0.1.0[1.7.18] v0.1.1[1.7.18] v0.2.0[1.7.19]
 github.com/goplus/llpkg/cjson v0.1.0 v0.1.1 v0.2.0
 ```
 
@@ -193,36 +203,58 @@ Or you can also view the info in json format.
 *e.g.* `llgo list -m -versions -json cjson`:
 
 ```go
-type VersionMapping struct {
-  CLibVersion  string
-  GoModuleVersions []string
+type Installer struct {
+	Name   string
+	Config map[string]string
+}
+
+type Package struct {
+	Name    string
+	Version string
+}
+
+type Upstream struct {
+	Installer Installer
+	Package   Package
 }
 
 type LLPkg struct {
-  GoModule         Module  // refer to https://go.dev/ref/mod#go-list-m
-  CLibVersion      string
-  VersionMappings  []VersionMapping
+	Upstreams []Upstream
+}
+
+type Module struct {
+  // ...
+  // refer to https://go.dev/ref/mod#go-list-m
+
+  LLPkg *LLPkg
 }
 ```
 
 ```json
 {
-  "GoModule": {
+  "Module": {
     "Path": "github.com/goplus/llpkg/cjson",
     "Version": "v0.1.0",
     "Time": "2025-02-10T16:11:33Z",
     "Indirect": false,
-    "GoVersion": "1.21"
-  },
-  "CLibVersion": "1.7.18",
-  "VersionMappings": [{
-    "CLibVersion": "1.7.18",
-    "GoModuleVersions": ["v0.1.0", "v0.1.1"]
-  },
-  {
-    "CLibVersion": "1.7.19",
-    "GoModuleVersions": ["v0.2.0"]
-  }]
+    "GoVersion": "1.21",
+    "LLPkg": {
+      "Upstreams": [
+        {
+          "Installer": {
+            "Name": "conan",
+            "Config": {
+              "cjson": "1.7.18"
+            }
+          },
+          "Package": {
+            "Name": "github.com/goplus/llpkg/cjson",
+            "Version": "v0.1.0"
+          }
+        }
+      ]
+    }
+  }
 }
 ```
 
