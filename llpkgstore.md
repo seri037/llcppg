@@ -39,9 +39,11 @@
 ```json
 {
   "upstream": {
-    "installer": "conan",
-    "config": {
-      "options": ""
+    "installer": {
+      "name": "conan",
+      "config": {
+        "options": ""
+      }
     },
     "package": {
       "name": "cjson",
@@ -61,8 +63,8 @@
 
 | key | type | defaultValue | optional | description |
 |------|------|--------|------|------|
-| installer | `string` | "conan" | ✅ | upstream binary provider |
-| config | `map[string]string` | [] | ✅ | config of installer |
+| installer.name | `string` | "conan" | ✅ | upstream binary provider |
+| installer.config | `map[string]string` | {} | ✅ | config of installer |
 | package.name | `string` | - | ❌ | package name in platform |
 | package.version | `string` | - | ❌ | original package version |
 
