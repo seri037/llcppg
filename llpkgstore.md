@@ -247,9 +247,10 @@ type LLPkg struct {
 
 A standard method for generating valid llpkgs:
 1. Receive binaries/headers from [installer](#llpkgcfg-structure), and index them into `.pc` files
-2. Automatically generate llpkg using a [generator](#llpkgcfg-structure) for different platforms
-3. Combine generated results into one Go module
-4. Debug and re-generate llpkg by modifying the configuration file
+2. Detect the generator from configuration files. For example, if an `llcppg.cfg` file is present in the current directory, we can directly use `llcppg`
+3. Automatically generate llpkg using a generator for different platforms
+4. Combine generated results into one Go module
+5. Debug and re-generate llpkg by modifying the configuration file
 
 ### Version tag rule
 1. Parse the `{MappedVersion}` of current package from PR commit footer
