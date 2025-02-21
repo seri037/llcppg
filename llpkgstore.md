@@ -64,7 +64,7 @@
 | key | type | defaultValue | optional | description |
 |------|------|--------|------|------|
 | installer.name | `string` | "conan" | ✅ | upstream binary provider |
-| installer.config | `map[string]string` | {} | ✅ | config of installer |
+| installer.config | `map[string]string` | {} | ✅ | config of installer |、
 | package.name | `string` | - | ❌ | package name in platform |
 | package.version | `string` | - | ❌ | original package version |
 
@@ -98,7 +98,7 @@ llgo get clib@cversion
 - `clib`: the original library name in C
 - `cversion`: the original version in C
 
-`llgo` automatically handles two things:
+`llgo get` automatically handles two things:
 
 1. Prepends required prefixes to `clib` references, converting them into valid `module_path` identifiers.
 2. Convert `cversion` to canonical `module_version` using the version mapping table.
@@ -116,7 +116,16 @@ llgo get clib[@latest]
 llgo get module_path[@latest]
 ```
 
-The optional `latest` identifier is also supported as a valid `cversion` or `module_version`. When `llgo get clib@latest`, llgo will find the latest llpkg corresponding to clib and pull it.
+The optional `latest` identifier is supported as a valid `cversion` or `module_version`. When `llgo get clib@latest`, `llgo get` will firstly convert `clib` to `module_path`, and then process it as `module_path@latest`. `llgo get` will find the latest llpkg and pull it.
+
+Wrong usage:
+
+```bash
+llgo get clib@module_version
+llgo get module_path@cversion
+```
+
+It's the format of the part before `@` that determines the how `llgo get` will handle the version; that is, `llgo get` will firstly check if it's a `clib`. If it is, the whole argument will be processed as `clib@cversion`; otherwise, it will be processed as `module_path@module_version`.
 
 > **Details of `llgo get`**
 >
@@ -124,22 +133,94 @@ The optional `latest` identifier is also supported as a valid `cversion` or `mod
 >  2. Pull the go module by `go get`.
 >  3. Check `llpkg.cfg` to determine if it's an llpkg. If it is:
 >
->   - Run `conan install` to install binaries. `.pc` files for building will be stored in `${LLGOMODCACHE}`.
->   - Indicate the original `cversion` by adding a comment in `go.mod`. (We ignore indirect dependencies for now.)
+>     - Run `conan install` to install binaries. `.pc` files for building will be stored in `${LLGOMODCACHE}`.
+>     - Indicate the original `cversion` by adding a comment in `go.mod`. (We ignore indirect dependencies for now.)
 >
->    ```go.mod
->    require (
->        github.com/goplus/llpkg/cjson v1.1.0  // cjson 1.7.18
->    )
->    ```
+>       ```
+>       // go.mod 
+>       require (
+>             github.com/goplus/llpkg/cjson v1.1.0  // cjson 1.7.18
+>       )
+>       ```
 
-## Listing clib version mapping [wip]
-
-`llgo list clib -versions` to provide user the version mapping of an llpkg. 
+## Listing clib version mapping
 
 ```
-1.3 => ["v0.1.0", "v1.0.1"]
-1.3.1 => ["v1.1.0"]
+llgo list -m [-versions] [-json] [clibs/modules]
+```
+
+- `llgo list -m` is compatible with `go list -m`
+- `clibs`: a set of space-separated clib[@cversion]
+- `modules`: a set of space-separated module_path[@module_version]
+ 
+You can use `clibs` as the argument. It'll print the module path and the current version mapping.
+
+*e.g.* `llgo list -m cjson`:
+
+```
+github.com/goplus/llpkg/cjson 1.3/v0.1.1
+```
+Add `-versions` to check all version mappings of the llpkg.
+
+*e.g.* `llgo list -m -versions cjson`:
+
+```
+github.com/goplus/llpkg/cjson 1.3/[v0.1.0 v0.1.1] 1.3.1/[v0.2.0]
+```
+
+When using `modules`, it follows the results of `go list`.
+
+*e.g.* `llgo list -m -versions github.com/goplus/llpkg/cjson`:
+
+```
+github.com/goplus/llpkg/cjson v0.1.0 v0.1.1 v0.2.0
+```
+
+You can also use both of them in one command.
+
+*e.g.* `llgo list -m -versions cjson github.com/goplus/llpkg/cjson`:
+
+```
+github.com/goplus/llpkg/cjson 1.3/[v0.1.0 v0.1.1] 1.3.1/[v0.2.0]
+github.com/goplus/llpkg/cjson v0.1.0 v0.1.1 v0.2.0
+```
+
+Or you can also view the info in json format.
+
+*e.g.* `llgo list -m -versions -json cjson`:
+
+```go
+type VersionMapping struct {
+  CLibVersion  string
+  GoModuleVersions []string
+}
+
+type LLPkg struct {
+  GoModule         Module  // refer to https://go.dev/ref/mod#go-list-m
+  CLibVersion      string
+  VersionMappings  []VersionMapping
+}
+```
+
+```json
+{
+  "GoModule": {
+    "Path": "github.com/goplus/llpkg/cjson",
+    "Version": "v0.1.0",
+    "Time": "2025-02-10T16:11:33Z",
+    "Indirect": false,
+    "GoVersion": "1.21"
+  },
+  "CLibVersion": "1.7.18",
+  "VersionMappings": [{
+    "CLibVersion": "1.7.18",
+    "GoModuleVersions": ["v0.1.0", "v0.1.1"]
+  },
+  {
+    "CLibVersion": "1.7.19",
+    "GoModuleVersions": ["v0.2.0"]
+  }]
+}
 ```
 
 ## Publication via GitHub Action
@@ -152,40 +233,56 @@ The optional `latest` identifier is also supported as a valid `cversion` or `mod
 4. Run test
 5. Review generated llpkg
 6. Merge PR
-7. Add a version tag by Github Action on main branch
+7. Run post-processing Github Action on main branch
 
 ### PR verification workflow
 1. Ensure that there is only one `llpkg.cfg` file across all directories. If multiple instances of `llpkg.cfg` are detected, the PR will be aborted.  
 2. Check if the directory name is valid, the directory name in PR **SHOULD** equal to `Package.Name` field in the `llpkg.cfg` file.
+3. Check the PR commit footer contains a {MappedVersion}.
 
 ### llpkg generation
 
 A standard method for generating valid llpkgs:
-1. Receive binaries/headers from [upstream](#llpkgcfg-structure), and index them into `.pc` files
-2. Automatically generate llpkg using a [toolchain](#llpkgcfg-structure) for different platforms
+1. Receive binaries/headers from [installer](#llpkgcfg-structure), and index them into `.pc` files
+2. Automatically generate llpkg using a [generator](#llpkgcfg-structure) for different platforms
 3. Combine generated results into one Go module
 4. Debug and re-generate llpkg by modifying the configuration file
 
 ### Version tag rule
-1. Follow Go's version management for nested modules. Tag `{CLibraryName}/{MappingVersion}` for each version.
-2. This design is fully compatible with native Go modules
+1. Parse the `{MappedVersion}` of current package from PR commit footer
+2. Follow Go's version management for nested modules. Tag `{CLibraryName}/{MappedVersion}` for each version.
+3. This design is fully compatible with native Go modules
     ```
     github.com/goplus/llpkg/cjson@v1.7.18
     ```
 
+### `{MappedVersion}` in PR commit
+`{MappedVersion}` **MUST** be included in the PR's latest commit, and **MUST** follow the format:  
+
+```
+Commit-as: {MappedVersion}
+```  
+
+The PR verification process will validate this format and abort the PR if it is invalid.
+
+Example:
+```
+git commit -m "feat: add cjson" -m "Commit-as: v1.0.0"
+git merge
+```
+
+### Post-processing Github Action
+
+Post-processing GitHub Action will tag the commit following the [Version Tag Rule](#version-tag-rule).
+
 ### Legacy version maintenance workflow
 
-1. Create an issue to specify which package needs to be maintained.
-2. Discuss whether it should be maintained or not.
-3. If maintenance is decided, close the issue and add the label `maintain:{CLibraryName}/{Version}` to trigger the GitHub Action.
-4. The GitHub Action will [create a branch](#rule) from the tag if the branch dones't exist.
-5. Create a maintenance pull request (PR) for the branch and re-run the [workflow](#workflow).
-
-#### Issue format
-
-The title of a legacy version maintenance issue **MUST** follow the format: `Maintenance: {CLibraryName}/{Version}`.  
-
-GitHub Action will be triggered only when the issue that match this specified format is closed.
+1. Create an issue to discuss the package that requires maintenance.  
+2. The maintainer creates a label in the format `branch:release-branch.{CLibraryName}/{MappedVersion}` and adds it to the issue if the package needs maintenance.  
+3. A GitHub Action is triggered when the label is created. It searches for issues with the specified label and determines whether a branch should be created based on the [Branch Maintenance Strategy](#branch-maintenance-strategy).  
+4. Open a pull request (PR) for maintenance. The maintainer **SHOULD** merge the PR with the commit message `fixed {CommitID}` to close the related issue.  
+5. When issues labeled with `branch:release-branch.` are closed, we need to determine whether to remove the branch. In the following case, the branch and label can be safely removed:  
+   - No commit contains `fix* {ThisCommitID}`.(* means the commit starting with `fix` prefix)
 
 ## Version conversion rules [wip]
 
@@ -280,25 +377,36 @@ New patch updates from upstream naturally replace older fixes. Keeping old patch
 - `c`: the original C library version.
 - `go`: the converted version.
 
-We have to consider about the module regenerating due to [toolchain](#llpkgcfg-structure) upgrading, hence, the relationship between the original C library version and the mapping version is one-to-many.
+We have to consider about the module regenerating due to [generator](#llpkgcfg-structure) upgrading, hence, the relationship between the original C library version and the mapping version is one-to-many.
 
 `llgo get` is expected to select the latest version from the `go` field.
 
 ## llpkg.goplus.org
 
-This domain is hosted by GitHub Pages, and the `llpkgstore.json` file is located in the same branch as GitHub Pages. When running `llgo get`, it will download the file to `LLGOMODCACHE`.
+This service is hosted by GitHub Pages, and the `llpkgstore.json` file is located in the same branch as GitHub Pages. When running `llgo get`, it will download the file to `LLGOMODCACHE`.
 
 ### Function
 
 1. Provide a download of the mapping table.
-2. Provide a version query of the Go Module corresponding to the C library.
-
-### Style
+2. Provide version queries for Go Modules corresponding to C libraries.
+3. Provide links to specific C libraries on Conan.io.
 
 ### Router
 
+1. `/`: Home page with a search bar at the top and multiple llpkgs. Users can search for llpkgs by name and view the latest two versions. Clicking an llpkg opens a modal displaying:
+   - Information about the original C library on Conan
+   - All available versions of the llpkg
+2. `/llpkgstore.json`: Provides the mapping table download.
+
+**Note**: llpkg details are displayed in modals instead of new pages, as `llpkgstore.json` is loaded during the initial homepage access and does not require additional requests.
+
 ### Interaction with web service
 
+When executing `llgo get clib@cversion`, a series of actions will be performed to convert `cversion` to `module_version`:
+1. Fetch the latest `llpkgstore.json`
+2. Parse the JSON file to find the corresponding `module_version` array
+3. Select the latest patched version from the array
+3. Retrieve llpkg
 
 ## `LLGOMODCACHE`
 
