@@ -1,4 +1,22 @@
-# llpkgstore documentation
+# llpkgstore design
+
+This document provides a high-level overview of the design of **llpkgstore**.
+
+We'll firstly introduce the architecture of llpkgstore, and then discuss how users can interact with the service. Finally, we'll explain the package generation workflow, and provide some crucial details of the implementation.
+
+## Abstract
+
+llpkgstore is designed to be a package distribution service for [**LLGo**](https://github.com/goplus/llgo).
+
+**llpkg** is a collection of Go modules that allow you to import C libraries as Go modules, which enables you to use C libraries in your Go projects. For now, most of the llpkg generation is handled by [**`llcppg`**](https://github.com/goplus/llcppg), a tool that converts C libraries into Go modules. 
+
+Surely, you can use `llcppg` manually to generate llpkgs, but it's not very easy to use. And retrieving llpkgs from a third-party service may cause security issues. Therefore, we've designed llpkgstore to provide a convenient way for users to obtain trustworthy llpkgs.
+
+llpkgstore is composed of the following components:
+
+1. A [GitHub repository](https://github.com/goplus/llpkg) that stores llpkgs, along with GitHub Actions for generating llpkgs.
+3. A [CLI tool](#getting-an-llpkg) `llgo get` for users to get llpkgs.
+2. A [web service](#llpkggoplusorg) that provides version mapping queries and llpkg searches.
 
 ## Directory structure
 
@@ -39,51 +57,36 @@
 ```json
 {
   "upstream": {
-    "installer": "conan",
-    "config": {
-      "options": ""
+    "installer": {
+      "name": "conan",
+      "config": {
+        "options": ""
+      }
     },
     "package": {
       "name": "cjson",
       "version": "1.7.18",
     }
-  },
-  "generator": {
-    "name": "llcppg",
-    "version": "0.9.7"
   }
 }
 ```
 
 ### Field description
 
-**package**
-
-| key         | type    | default value   | optional | meaning           |
-| -------------- | ------- | -------- | -------- | -------------- |
-| name           | `string`  |        | ❌       | package name       |
-| cVersion        | `string`  | \<latest\>       | ✅       | original c package version    |
-| moduleVersion | `string` |  v1.0.0  | ✅ | llgo module version |
-
 **upstream**
 
-| key         | type    | default value   | optional | meaning           |
-| -------------- | ------- | -------- | -------- | -------------- |
-| name           | `string`  | "conan"       | ✅       | upstream package platform   |
-| config        | `map[string]string`  | []       | ✅       | platform CLI option |
-
-**toolchain**
-
-| key         | type    | default value   | optional | meaning           |
-| -------------- | ------- | -------- | -------- | -------------- |
-| name           | `string`  | "llcppg"       | ✅       | toolchain name  |
-| version        | `string`  | "latest" | ✅       | toolchain version   |
+| key | type | defaultValue | optional | description |
+|------|------|--------|------|------|
+| installer.name | `string` | "conan" | ✅ | upstream binary provider |
+| installer.config | `map[string]string` | {} | ✅ | config of installer |
+| package.name | `string` | - | ❌ | package name in platform |
+| package.version | `string` | - | ❌ | original package version |
 
 #### For developers
 
-If no `cVersion` is specified, the `conan search` command will be used to fetch all available versions of the current C package. You can then manually select the version from the command line.
+**Currently**, the cfg system supports third-party libraries for C/C++ **only**. Support for other languages, such as Python and Rust, may be added in the future, but there are no updates at this time. 
 
-If no `moduleVersion` is specified, it will **currently** default to `v1.0.0`. This may cause conflicts with existing tags in the current repository. Please better fill it by yourself.
+At the moment, we heavily rely on Conan as the upstream distribution platform for C libraries. Therefore, Conan is the only installer supported for C libraries. This field exists for better extensibility and a possible situation that Conan's service might be unavailable in the future. We have planned to introduce more distribution platforms in the future to provide broader coverage.  
 
 ## Getting an llpkg
 
@@ -165,7 +168,7 @@ Add `-versions` to check all version mappings of the llpkg.
 *e.g.* `llgo list -m -versions cjson`:
 
 ```
-github.com/goplus/llpkg/cjson 1.3/[v0.1.0 v0.1.1] 1.3.1/[v0.2.0]
+github.com/goplus/llpkg/cjson 1.3/[v0.1.0,v0.1.1] 1.3.1/[v0.2.0]
 ```
 
 When using `modules`, it follows the results of `go list`.
@@ -181,7 +184,7 @@ You can also use both of them in one command.
 *e.g.* `llgo list -m -versions cjson github.com/goplus/llpkg/cjson`:
 
 ```
-github.com/goplus/llpkg/cjson 1.3/[v0.1.0 v0.1.1] 1.3.1/[v0.2.0]
+github.com/goplus/llpkg/cjson 1.3/[v0.1.0,v0.1.1] 1.3.1/[v0.2.0]
 github.com/goplus/llpkg/cjson v0.1.0 v0.1.1 v0.2.0
 ```
 
@@ -396,7 +399,12 @@ This service is hosted by GitHub Pages, and the `llpkgstore.json` file is locate
 1. `/`: Home page with a search bar at the top and multiple llpkgs. Users can search for llpkgs by name and view the latest two versions. Clicking an llpkg opens a modal displaying:
    - Information about the original C library on Conan
    - All available versions of the llpkg
+
+  ![Index](./docs/llpkg_index.svg)
+
 2. `/llpkgstore.json`: Provides the mapping table download.
+
+  ![Pkg detail](./docs/llpkg_pkg.svg)
 
 **Note**: llpkg details are displayed in modals instead of new pages, as `llpkgstore.json` is loaded during the initial homepage access and does not require additional requests.
 
