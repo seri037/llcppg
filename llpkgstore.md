@@ -8,13 +8,13 @@ We'll firstly introduce the architecture of llpkgstore, and then discuss how use
 
 llpkgstore is designed to be a package distribution service for [**LLGo**](https://github.com/goplus/llgo).
 
-**llpkg** is a collection of Go modules that allow you to import C libraries as Go modules, which enables you to use C libraries in your Go projects. For now, most of the llpkg generation is handled by [**`llcppg`**](https://github.com/goplus/llcppg), a tool that converts C libraries into Go modules. 
+An **llpkg** is a Go module that invokes libraries of other languages through [**LLGo**](https://github.com/goplus/llgo)'s ecosystem integration capability. For now, most of the llpkg generation is handled by [**`llcppg`**](https://github.com/goplus/llcppg), a tool that converts C libraries into Go modules. 
 
-Surely, you can use `llcppg` manually to generate llpkgs, but it's not very easy to use. And retrieving llpkgs from a third-party service may cause security issues. Therefore, we've designed llpkgstore to provide a convenient way for users to obtain trustworthy llpkgs.
+You can also use `llcppg` manually to generate llpkgs, but it's not very easy to use. And retrieving llpkgs from a third-party service may cause security issues. Therefore, we've designed llpkgstore to provide a convenient way for users to obtain trustworthy llpkgs.
 
 llpkgstore is composed of the following components:
 
-1. A [GitHub repository](https://github.com/goplus/llpkg) that stores llpkgs, along with GitHub Actions for generating llpkgs.
+1. A [GitHub repository](https://github.com/goplus/llpkg) that stores llpkgs, along with GitHub Actions for generating llpkgs automatically.
 3. A [CLI tool](#getting-an-llpkg) `llgo get` for users to get llpkgs.
 2. A [web service](#llpkggoplusorg) that provides version mapping queries and llpkg searches.
 
@@ -67,10 +67,6 @@ llpkgstore is composed of the following components:
       "name": "cjson",
       "version": "1.7.18",
     }
-  },
-  "generator": {
-    "name": "llcppg",
-    "version": "0.9.7"
   }
 }
 ```
@@ -86,20 +82,9 @@ llpkgstore is composed of the following components:
 | package.name | `string` | - | ❌ | package name in platform |
 | package.version | `string` | - | ❌ | original package version |
 
-**generator** 
-
-| key | type | defaultValue | optional | description |
-|------|------|--------|------|------|
-| name | `string` | "llcppg" | ✅ | generator name |
-| version | `string` | "latest" | ✅ | generator version |
-
 #### For developers
 
 **Currently**, the cfg system supports third-party libraries for C/C++ **only**. Support for other languages, such as Python and Rust, may be added in the future, but there are no updates at this time. 
-
-For C/C++, the only supported generator is llcppg. 
-
-**IMPORTANT**: llcppg is still in development and does not have strict versioning, so it is recommended to use `latest` as the default value for configuration.
 
 At the moment, we heavily rely on Conan as the upstream distribution platform for C libraries. Therefore, Conan is the only installer supported for C libraries. This field exists for better extensibility and a possible situation that Conan's service might be unavailable in the future. We have planned to introduce more distribution platforms in the future to provide broader coverage.  
 
@@ -171,19 +156,29 @@ llgo list -m [-versions] [-json] [clibs/modules]
 - `clibs`: a set of space-separated clib[@cversion]
 - `modules`: a set of space-separated module_path[@module_version]
  
-You can use `clibs` as the argument. It'll print the module path and the current version mapping.
+You can use `clibs` as the argument. It'll print the module path and the upstreams of the local llpkg according to `go.mod` and `llpkg.cfg`.
 
 *e.g.* `llgo list -m cjson`:
 
 ```
-github.com/goplus/llpkg/cjson 1.3/v0.1.1
+github.com/goplus/llpkg/cjson v0.1.0[conan:cjson/1.7.18]
 ```
-Add `-versions` to check all version mappings of the llpkg.
+
+You can also use `module_path` as the argument, it will act the same as `go list -m`.
+
+*e.g.* `llgo list -m github.com/goplus/llpkg/cjson`:
+
+```
+github.com/goplus/llpkg/cjson v0.1.0
+```
+
+
+Add `-versions` to check all version mappings of a llpkg.
 
 *e.g.* `llgo list -m -versions cjson`:
 
 ```
-github.com/goplus/llpkg/cjson 1.3/[v0.1.0,v0.1.1] 1.3.1/[v0.2.0]
+github.com/goplus/llpkg/cjson v0.1.0[1.7.18] v0.1.1[1.7.18] v0.2.0[1.7.19]
 ```
 
 When using `modules`, it follows the results of `go list`.
@@ -199,7 +194,7 @@ You can also use both of them in one command.
 *e.g.* `llgo list -m -versions cjson github.com/goplus/llpkg/cjson`:
 
 ```
-github.com/goplus/llpkg/cjson 1.3/[v0.1.0,v0.1.1] 1.3.1/[v0.2.0]
+github.com/goplus/llpkg/cjson v0.1.0[1.7.18] v0.1.1[1.7.18] v0.2.0[1.7.19]
 github.com/goplus/llpkg/cjson v0.1.0 v0.1.1 v0.2.0
 ```
 
@@ -208,36 +203,58 @@ Or you can also view the info in json format.
 *e.g.* `llgo list -m -versions -json cjson`:
 
 ```go
-type VersionMapping struct {
-  CLibVersion  string
-  GoModuleVersions []string
+type Installer struct {
+	Name   string
+	Config map[string]string
+}
+
+type Package struct {
+	Name    string
+	Version string
+}
+
+type Upstream struct {
+	Installer Installer
+	Package   Package
 }
 
 type LLPkg struct {
-  GoModule         Module  // refer to https://go.dev/ref/mod#go-list-m
-  CLibVersion      string
-  VersionMappings  []VersionMapping
+	Upstreams []Upstream
+}
+
+type Module struct {
+  // ...
+  // refer to https://go.dev/ref/mod#go-list-m
+
+  LLPkg *LLPkg
 }
 ```
 
 ```json
 {
-  "GoModule": {
+  "Module": {
     "Path": "github.com/goplus/llpkg/cjson",
     "Version": "v0.1.0",
     "Time": "2025-02-10T16:11:33Z",
     "Indirect": false,
-    "GoVersion": "1.21"
-  },
-  "CLibVersion": "1.7.18",
-  "VersionMappings": [{
-    "CLibVersion": "1.7.18",
-    "GoModuleVersions": ["v0.1.0", "v0.1.1"]
-  },
-  {
-    "CLibVersion": "1.7.19",
-    "GoModuleVersions": ["v0.2.0"]
-  }]
+    "GoVersion": "1.21",
+    "LLPkg": {
+      "Upstreams": [
+        {
+          "Installer": {
+            "Name": "conan",
+            "Config": {
+              "cjson": "1.7.18"
+            }
+          },
+          "Package": {
+            "Name": "github.com/goplus/llpkg/cjson",
+            "Version": "v0.1.0"
+          }
+        }
+      ]
+    }
+  }
 }
 ```
 
@@ -262,9 +279,10 @@ type LLPkg struct {
 
 A standard method for generating valid llpkgs:
 1. Receive binaries/headers from [installer](#llpkgcfg-structure), and index them into `.pc` files
-2. Automatically generate llpkg using a [generator](#llpkgcfg-structure) for different platforms
-3. Combine generated results into one Go module
-4. Debug and re-generate llpkg by modifying the configuration file
+2. Detect the generator from configuration files. For example, if an `llcppg.cfg` file is present in the current directory, we can directly use `llcppg`
+3. Automatically generate llpkg using a generator for different platforms
+4. Combine generated results into one Go module
+5. Debug and re-generate llpkg by modifying the configuration file
 
 ### Version tag rule
 1. Parse the `{MappedVersion}` of current package from PR commit footer
@@ -414,7 +432,12 @@ This service is hosted by GitHub Pages, and the `llpkgstore.json` file is locate
 1. `/`: Home page with a search bar at the top and multiple llpkgs. Users can search for llpkgs by name and view the latest two versions. Clicking an llpkg opens a modal displaying:
    - Information about the original C library on Conan
    - All available versions of the llpkg
+
+  ![Index](./docs/llpkg_index.svg)
+
 2. `/llpkgstore.json`: Provides the mapping table download.
+
+  ![Pkg detail](./docs/llpkg_pkg.svg)
 
 **Note**: llpkg details are displayed in modals instead of new pages, as `llpkgstore.json` is loaded during the initial homepage access and does not require additional requests.
 
