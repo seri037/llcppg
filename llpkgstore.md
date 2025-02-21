@@ -1,4 +1,22 @@
-# llpkgstore documentation
+# llpkgstore design
+
+This document provides a high-level overview of the design of **llpkgstore**.
+
+We'll firstly introduce the architecture of llpkgstore, and then discuss how users can interact with the service. Finally, we'll explain the package generation workflow, and provide some crucial details of the implementation.
+
+## Abstract
+
+llpkgstore is designed to be a package distribution service for [**LLGo**](https://github.com/goplus/llgo).
+
+**llpkg** is a collection of Go modules that allow you to import C libraries as Go modules, which enables you to use C libraries in your Go projects. For now, most of the llpkg generation is handled by [**`llcppg`**](https://github.com/goplus/llcppg), a tool that converts C libraries into Go modules. 
+
+Surely, you can use `llcppg` manually to generate llpkgs, but it's not very easy to use. And retrieving llpkgs from a third-party service may cause security issues. Therefore, we've designed llpkgstore to provide a convenient way for users to obtain trustworthy llpkgs.
+
+llpkgstore is composed of the following components:
+
+1. A [GitHub repository](https://github.com/goplus/llpkg) that stores llpkgs, along with GitHub Actions for generating llpkgs.
+3. A [CLI tool](#getting-an-llpkg) `llgo get` for users to get llpkgs.
+2. A [web service](#llpkggoplusorg) that provides version mapping queries and llpkg searches.
 
 ## Directory structure
 
@@ -39,9 +57,11 @@
 ```json
 {
   "upstream": {
-    "installer": "conan",
-    "config": {
-      "options": ""
+    "installer": {
+      "name": "conan",
+      "config": {
+        "options": ""
+      }
     },
     "package": {
       "name": "cjson",
@@ -61,8 +81,8 @@
 
 | key | type | defaultValue | optional | description |
 |------|------|--------|------|------|
-| installer | `string` | "conan" | ✅ | upstream binary provider |
-| config | `map[string]string` | [] | ✅ | config of installer |
+| installer.name | `string` | "conan" | ✅ | upstream binary provider |
+| installer.config | `map[string]string` | {} | ✅ | config of installer |
 | package.name | `string` | - | ❌ | package name in platform |
 | package.version | `string` | - | ❌ | original package version |
 
