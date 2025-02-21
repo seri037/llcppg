@@ -49,10 +49,6 @@
       "name": "cjson",
       "version": "1.7.18",
     }
-  },
-  "generator": {
-    "name": "llcppg",
-    "version": "0.9.7"
   }
 }
 ```
@@ -68,20 +64,9 @@
 | package.name | `string` | - | ❌ | package name in platform |
 | package.version | `string` | - | ❌ | original package version |
 
-**generator** 
-
-| key | type | defaultValue | optional | description |
-|------|------|--------|------|------|
-| name | `string` | "llcppg" | ✅ | generator name |
-| version | `string` | "latest" | ✅ | generator version |
-
 #### For developers
 
 **Currently**, the cfg system supports third-party libraries for C/C++ **only**. Support for other languages, such as Python and Rust, may be added in the future, but there are no updates at this time. 
-
-For C/C++, the only supported generator is llcppg. 
-
-**IMPORTANT**: llcppg is still in development and does not have strict versioning, so it is recommended to use `latest` as the default value for configuration.
 
 At the moment, we heavily rely on Conan as the upstream distribution platform for C libraries. Therefore, Conan is the only installer supported for C libraries. This field exists for better extensibility and a possible situation that Conan's service might be unavailable in the future. We have planned to introduce more distribution platforms in the future to provide broader coverage.  
 
