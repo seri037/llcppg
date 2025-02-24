@@ -258,69 +258,7 @@ type Module struct {
 }
 ```
 
-## Publication via GitHub Action
-
-### Workflow
-
-1. Create PR to trigger GitHub Action
-2. PR verification
-3. llpkg generation
-4. Run test
-5. Review generated llpkg
-6. Merge PR
-7. Run post-processing Github Action on main branch
-
-### PR verification workflow
-1. Ensure that there is only one `llpkg.cfg` file across all directories. If multiple instances of `llpkg.cfg` are detected, the PR will be aborted.  
-2. Check if the directory name is valid, the directory name in PR **SHOULD** equal to `Package.Name` field in the `llpkg.cfg` file.
-3. Check the PR commit footer contains a {MappedVersion}.
-
-### llpkg generation
-
-A standard method for generating valid llpkgs:
-1. Receive binaries/headers from [installer](#llpkgcfg-structure), and index them into `.pc` files
-2. Detect the generator from configuration files. For example, if an `llcppg.cfg` file is present in the current directory, we can directly use `llcppg`
-3. Automatically generate llpkg using a generator for different platforms
-4. Combine generated results into one Go module
-5. Debug and re-generate llpkg by modifying the configuration file
-
-### Version tag rule
-1. Parse the `{MappedVersion}` of current package from PR commit footer
-2. Follow Go's version management for nested modules. Tag `{CLibraryName}/{MappedVersion}` for each version.
-3. This design is fully compatible with native Go modules
-    ```
-    github.com/goplus/llpkg/cjson@v1.7.18
-    ```
-
-### `{MappedVersion}` in PR commit
-`{MappedVersion}` **MUST** be included in the PR's latest commit, and **MUST** follow the format:  
-
-```
-Commit-as: {MappedVersion}
-```  
-
-The PR verification process will validate this format and abort the PR if it is invalid.
-
-Example:
-```
-git commit -m "feat: add cjson" -m "Commit-as: v1.0.0"
-git merge
-```
-
-### Post-processing Github Action
-
-Post-processing GitHub Action will tag the commit following the [Version Tag Rule](#version-tag-rule).
-
-### Legacy version maintenance workflow
-
-1. Create an issue to discuss the package that requires maintenance.  
-2. The maintainer creates a label in the format `branch:release-branch.{CLibraryName}/{MappedVersion}` and adds it to the issue if the package needs maintenance.  
-3. A GitHub Action is triggered when the label is created. It searches for issues with the specified label and determines whether a branch should be created based on the [Branch Maintenance Strategy](#branch-maintenance-strategy).  
-4. Open a pull request (PR) for maintenance. The maintainer **SHOULD** merge the PR with the commit message `fixed {CommitID}` to close the related issue.  
-5. When issues labeled with `branch:release-branch.` are closed, we need to determine whether to remove the branch. In the following case, the branch and label can be safely removed:  
-   - No commit contains `fix* {ThisCommitID}`.(* means the commit starting with `fix` prefix)
-
-## Version conversion rules [wip]
+## Version conversion rules
 
 We use a mapping table to convert C library versions to llpkg versions.
 
@@ -416,6 +354,68 @@ New patch updates from upstream naturally replace older fixes. Keeping old patch
 We have to consider about the module regenerating due to [generator](#llpkgcfg-structure) upgrading, hence, the relationship between the original C library version and the mapping version is one-to-many.
 
 `llgo get` is expected to select the latest version from the `go` field.
+
+## Publication via GitHub Action
+
+### Workflow
+
+1. Create PR to trigger GitHub Action
+2. PR verification
+3. llpkg generation
+4. Run test
+5. Review generated llpkg
+6. Merge PR
+7. Run post-processing Github Action on main branch
+
+### PR verification workflow
+1. Ensure that there is only one `llpkg.cfg` file across all directories. If multiple instances of `llpkg.cfg` are detected, the PR will be aborted.  
+2. Check if the directory name is valid, the directory name in PR **SHOULD** equal to `Package.Name` field in the `llpkg.cfg` file.
+3. Check the PR commit footer contains a {MappedVersion}.
+
+### llpkg generation
+
+A standard method for generating valid llpkgs:
+1. Receive binaries/headers from [installer](#llpkgcfg-structure), and index them into `.pc` files
+2. Detect the generator from configuration files. For example, if an `llcppg.cfg` file is present in the current directory, we can directly use `llcppg`
+3. Automatically generate llpkg using a generator for different platforms
+4. Combine generated results into one Go module
+5. Debug and re-generate llpkg by modifying the configuration file
+
+### Version tag rule
+1. Parse the `{MappedVersion}` of current package from PR commit footer
+2. Follow Go's version management for nested modules. Tag `{CLibraryName}/{MappedVersion}` for each version.
+3. This design is fully compatible with native Go modules
+    ```
+    github.com/goplus/llpkg/cjson@v1.7.18
+    ```
+
+### `{MappedVersion}` in PR commit
+`{MappedVersion}` **MUST** be included in the PR's latest commit, and **MUST** follow the format:  
+
+```
+Commit-as: {MappedVersion}
+```  
+
+The PR verification process will validate this format and abort the PR if it is invalid.
+
+Example:
+```
+git commit -m "feat: add cjson" -m "Commit-as: v1.0.0"
+git merge
+```
+
+### Post-processing Github Action
+
+Post-processing GitHub Action will tag the commit following the [Version Tag Rule](#version-tag-rule).
+
+### Legacy version maintenance workflow
+
+1. Create an issue to discuss the package that requires maintenance.  
+2. The maintainer creates a label in the format `branch:release-branch.{CLibraryName}/{MappedVersion}` and adds it to the issue if the package needs maintenance.  
+3. A GitHub Action is triggered when the label is created. It searches for issues with the specified label and determines whether a branch should be created based on the [Branch Maintenance Strategy](#branch-maintenance-strategy).  
+4. Open a pull request (PR) for maintenance. The maintainer **SHOULD** merge the PR with the commit message `fixed {CommitID}` to close the related issue.  
+5. When issues labeled with `branch:release-branch.` are closed, we need to determine whether to remove the branch. In the following case, the branch and label can be safely removed:  
+   - No commit contains `fix* {ThisCommitID}`.(* means the commit starting with `fix` prefix)
 
 ## llpkg.goplus.org
 
