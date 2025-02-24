@@ -258,9 +258,9 @@ type Module struct {
 }
 ```
 
-## Version conversion rules
+## Version mapping rules
 
-We use a mapping table to convert C library versions to llpkg versions.
+We use a mapping table to convert a original C library version to a **MappedVersion**.
 
 ### Initial version
 
