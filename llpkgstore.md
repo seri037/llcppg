@@ -157,7 +157,7 @@ llgo list -m [-versions] [-json] [llpkgs/modules]
 - `llpkgs`: a set of space-separated clib[@cversion] or module_path[@module_version] which is identified as a llpkg.
 - `modules`: a set of space-separated module_path[@module_version] which is identified as a normal go module.
  
-You can use `clibs` as the argument. It is considered to be a go module in llpkgstore and converted to `github.com/goplus/llpkg/cjson`. `llgo list` will print the module path and the upstream of the local llpkg according to `go.mod` and `llpkg.cfg`. 
+You can use `clibs` as the argument. It will be interpreted as an llpkg in llpkgstore and converted to `github.com/goplus/llpkg/cjson`. `llgo list` will print the module path and the upstream of the local llpkg according to `go.mod` and `llpkg.cfg`. 
 
 *e.g.* `llgo list -m cjson`:
 
