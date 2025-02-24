@@ -136,18 +136,21 @@ It's the format of the part before `@` that determines the how `llgo get` will h
 >
 >  1. `llgo` automatically resolves `clib@cversion` syntax into canonical `module_path@module_version` format.
 >  2. Pull the go module by `go get`.
->  3. Check `llpkg.cfg` to determine if it's an llpkg and check `upstream.installer` to exist in `llpkg.cfg`. If it is a llpkg:
->
->     - If `upstream.installer` is specified, `llgo get` will run `upstream.installer` to install binaries. `.pc` files for building will be stored in `${LLGOMODCACHE}`. Indicate the original `cversion` by adding a comment in `go.mod`. (We ignore indirect dependencies for now.)
+>  3. Check `llpkg.cfg` to determine if it's an llpkg. If it is: 
+>    - `llgo get` will run `upstream.installer` to install binaries. `.pc` files for building will be stored in `${LLGOMODCACHE}`.
+>    - A comment in `go.mod` will be added to indicate the original `cversion`. Comments of indirect dependencies will be automatically processed by `go mod tidy`.
 >
 >       ```
 >       // go.mod 
 >       require (
 >             github.com/goplus/llpkg/cjson v1.1.0  // conan:cjson/1.7.18
 >       )
+>       
+>       require (
+>             github.com/goplus/llpkg/zlib v1.0.0   // indirect; conan:zlib/1.3.1
+>       )
 >       ```
 >
->     - If `upstream.installer` is not specified, user **SHOULD** install binaries manually.  
 
 ## Listing clib version mapping
 
