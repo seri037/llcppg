@@ -167,7 +167,7 @@ github.com/goplus/llpkg/cjson v0.1.0[conan:cjson/1.7.18]
 
 If it is `v0.1.0[cjson/1.7.18]`, it means that the `cjson` **SHOULD** be installed manually by the user.
 
-You can also use `module_path` as the argument. `llgo list` checks to see if it is a llpkg. If it is, it prints as shown in the above example.
+You can also use `module_path` as the argument. `llgo list` will check if it is a llpkg. If it is, it prints as shown in the above example.
 
 *e.g.* `llgo list -m github.com/goplus/llpkg/cjson`:
 
