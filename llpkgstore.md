@@ -67,7 +67,7 @@ To enable `llgo` to correctly identify the llpkg, an llpkg includes at minimum a
     },
     "package": {
       "name": "cjson",
-      "version": "1.7.18",
+      "version": "1.7.18"
     }
   }
 }
@@ -136,29 +136,42 @@ It's the format of the part before `@` that determines the how `llgo get` will h
 >
 >  1. `llgo` automatically resolves `clib@cversion` syntax into canonical `module_path@module_version` format.
 >  2. Pull the go module by `go get`.
->  3. Check `llpkg.cfg` to determine if it's an llpkg. If it is:
+>  3. Check `llpkg.cfg` to determine if it's an llpkg and check `upstream.installer` to exist in `llpkg.cfg`. If it is a llpkg:
 >
->     - Run `conan install` to install binaries. `.pc` files for building will be stored in `${LLGOMODCACHE}`.
->     - Indicate the original `cversion` by adding a comment in `go.mod`. (We ignore indirect dependencies for now.)
+>     - If `upstream.installer` is specified, `llgo get` will run `upstream.installer` to install binaries. `.pc` files for building will be stored in `${LLGOMODCACHE}`. Indicate the original `cversion` by adding a comment in `go.mod`. (We ignore indirect dependencies for now.)
 >
 >       ```
 >       // go.mod 
 >       require (
->             github.com/goplus/llpkg/cjson v1.1.0  // cjson 1.7.18
+>             github.com/goplus/llpkg/cjson v1.1.0  // conan:cjson/1.7.18
 >       )
 >       ```
+>
+>     - If `upstream.installer` is not specified, user **SHOULD** install binaries manually.  
 
 ## Listing clib version mapping
 
 ```
-llgo list -m [-versions] [-json] [clibs/modules]
+llgo list -m [-versions] [-json] [modules/clibs]
 ```
 
-- `llgo list -m` is compatible with `go list -m`
+- `llgo list -m` is compatible with `go list -m`.
+- `modules`: a set of space-separated module_path[@module_version].
 - `clibs`: a set of space-separated clib[@cversion]
-- `modules`: a set of space-separated module_path[@module_version]
- 
-You can use `clibs` as the argument. It'll print the module path and the upstreams of the local llpkg according to `go.mod` and `llpkg.cfg`.
+
+Each argument is processed separately.
+
+### `module`
+
+`llgo list` will check if the `module` is an llpkg or a normal go module by seeking if `llpkg.cfg` exists.
+
+#### llpkg
+
+If the `module` is an llpkg:
+
+1. `llgo list -m`
+
+`llgo list` will print the module path and the upstream of the local llpkg according to `go.mod` and `llpkg.cfg`. 
 
 *e.g.* `llgo list -m cjson`:
 
@@ -166,45 +179,37 @@ You can use `clibs` as the argument. It'll print the module path and the upstrea
 github.com/goplus/llpkg/cjson v0.1.0[conan:cjson/1.7.18]
 ```
 
-You can also use `module_path` as the argument, it will act the same as `go list -m`.
+2. `llgo list -m -versions`
 
-*e.g.* `llgo list -m github.com/goplus/llpkg/cjson`:
+Add `-versions` to check all version mappings of an llpkg.
 
-```
-github.com/goplus/llpkg/cjson v0.1.0
-```
-
-
-Add `-versions` to check all version mappings of a llpkg.
-
-*e.g.* `llgo list -m -versions cjson`:
+*e.g.* `llgo list -m -versions cjson` or `llgo list -m -versions github.com/goplus/llpkg/cjson`:
 
 ```
-github.com/goplus/llpkg/cjson v0.1.0[1.7.18] v0.1.1[1.7.18] v0.2.0[1.7.19]
+github.com/goplus/llpkg/cjson v0.1.0[conan:cjson/1.7.18] v0.1.1[conan:cjson/1.7.18] v0.2.0[conan:cjson/1.7.19]
 ```
 
-When using `modules`, it follows the results of `go list`.
+3. JSON output
 
-*e.g.* `llgo list -m -versions github.com/goplus/llpkg/cjson`:
-
-```
-github.com/goplus/llpkg/cjson v0.1.0 v0.1.1 v0.2.0
-```
-
-You can also use both of them in one command.
-
-*e.g.* `llgo list -m -versions cjson github.com/goplus/llpkg/cjson`:
-
-```
-github.com/goplus/llpkg/cjson v0.1.0[1.7.18] v0.1.1[1.7.18] v0.2.0[1.7.19]
-github.com/goplus/llpkg/cjson v0.1.0 v0.1.1 v0.2.0
-```
-
-Or you can also view the info in json format.
-
-*e.g.* `llgo list -m -versions -json cjson`:
+We define a Go Struct for the output of `llgo list -m -versions -json`:
 
 ```go
+type Module struct {
+  // ...
+  // refer to struct Module in https://go.dev/ref/mod#go-list-m
+
+  LLPkg *LLPkg
+}
+
+type LLPkg struct {
+	Upstream Upstream
+}
+
+type Upstream struct {
+	Installer Installer
+	Package   Package
+}
+
 type Installer struct {
 	Name   string
 	Config map[string]string
@@ -214,50 +219,45 @@ type Package struct {
 	Name    string
 	Version string
 }
-
-type Upstream struct {
-	Installer Installer
-	Package   Package
-}
-
-type LLPkg struct {
-	Upstreams []Upstream
-}
-
-type Module struct {
-  // ...
-  // refer to https://go.dev/ref/mod#go-list-m
-
-  LLPkg *LLPkg
-}
 ```
+
+*e.g.* `llgo list -m -versions -json cjson`:
 
 ```json
 {
-  "Module": {
-    "Path": "github.com/goplus/llpkg/cjson",
-    "Version": "v0.1.0",
-    "Time": "2025-02-10T16:11:33Z",
-    "Indirect": false,
-    "GoVersion": "1.21",
-    "LLPkg": {
-      "Upstreams": [
-        {
-          "Installer": {
-            "Name": "conan",
-            "Config": {
-              "cjson": "1.7.18"
-            }
-          },
-          "Package": {
-            "Name": "github.com/goplus/llpkg/cjson",
-            "Version": "v0.1.0"
+  "Path": "github.com/goplus/llpkg/cjson",
+  "Version": "v0.1.0",
+  "Time": "2025-02-10T16:11:33Z",
+  "Indirect": false,
+  "GoVersion": "1.21",
+  "LLPkg": {
+    "Upstream": {
+        "Installer": {
+          "Name": "conan",
+          "Config": {
+            "options":""
           }
+        },
+        "Package": {
+          "Name": "cjson",
+          "Version": "1.7.18"
         }
-      ]
-    }
+      }
   }
 }
+```
+#### Normal Go Module
+
+The output of `llgo list` will be the same as `go list`.
+
+### `clib`
+
+You can use `clib` as a argument. It will be interpreted as an llpkg in llpkgstore and converted to multiple `github.com/goplus/llpkg/{clib}`. The output is the same as the results generated by modules identified as llpkgs.
+
+e.g. `llgo list -m -versions cjson`
+
+```
+github.com/goplus/llpkg/cjson v0.1.0[conan:cjson/1.7.18] v0.1.1[conan:cjson/1.7.18] v0.2.0[conan:cjson/1.7.19]
 ```
 
 ## Version mapping rules
@@ -341,7 +341,7 @@ New patch updates from upstream naturally replace older fixes. Keeping old patch
         "versions" : [{
             "c": "1.3",
             "go": ["v0.1.0", "v0.1.1"]
-        }, 
+        },
         {
             "c": "1.3.1",
             "go": ["v1.1.0"]
