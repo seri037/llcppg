@@ -145,7 +145,7 @@ It's the format of the part before `@` that determines the how `llgo get` will h
 >       )
 >       ```
 >
->      - If `upstream.installer` is not specified, user **SHOULD** install binaries manually.  
+>     - If `upstream.installer` is not specified, user **SHOULD** install binaries manually.  
 
 ## Listing clib version mapping
 
