@@ -351,7 +351,7 @@ New patch updates from upstream naturally replace older fixes. Keeping old patch
 - `c`: the original C library version.
 - `go`: the converted version.
 
-We have to consider about the module regenerating due to [generator](#llpkgcfg-structure) upgrading, hence, the relationship between the original C library version and the mapping version is one-to-many.
+We have to consider about the module regenerating due to generator upgrading, hence, the relationship between the original C library version and the mapping version is one-to-many.
 
 `llgo get` is expected to select the latest version from the `go` field.
 
@@ -393,15 +393,16 @@ A standard method for generating valid llpkgs:
 `{MappedVersion}` **MUST** be included in the PR's latest commit, and **MUST** follow the format:  
 
 ```
-Commit-as: {MappedVersion}
+Release-as: {CLibraryName}/{MappedVersion}
 ```  
 
 The PR verification process will validate this format and abort the PR if it is invalid.
 
 Example:
-```
-git commit -m "feat: add cjson" -m "Commit-as: v1.0.0"
+```bash
 git merge
+# modify merge commit message
+git commit --amend -m "feat: add cjson" -m "Release-as: cjson/v1.0.0"
 ```
 
 ### Post-processing Github Action
@@ -413,9 +414,9 @@ Post-processing GitHub Action will tag the commit following the [Version Tag Rul
 1. Create an issue to discuss the package that requires maintenance.  
 2. The maintainer creates a label in the format `branch:release-branch.{CLibraryName}/{MappedVersion}` and adds it to the issue if the package needs maintenance.  
 3. A GitHub Action is triggered when the label is created. It searches for issues with the specified label and determines whether a branch should be created based on the [Branch Maintenance Strategy](#branch-maintenance-strategy).  
-4. Open a pull request (PR) for maintenance. The maintainer **SHOULD** merge the PR with the commit message `fixed {CommitID}` to close the related issue.  
+4. Open a pull request (PR) for maintenance. The maintainer **SHOULD** merge the PR with the commit message `fixed {IssueID}` to close the related issue.  
 5. When issues labeled with `branch:release-branch.` are closed, we need to determine whether to remove the branch. In the following case, the branch and label can be safely removed:  
-   - No commit contains `fix* {ThisCommitID}`.(* means the commit starting with `fix` prefix)
+   - No commit contains `fix* {ThisIssueID}`.(* means the commit starting with `fix` prefix)
 
 ## llpkg.goplus.org
 
