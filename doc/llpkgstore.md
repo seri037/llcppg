@@ -439,11 +439,11 @@ This service is hosted by GitHub Pages, and the `llpkgstore.json` file is locate
    - Information about the original C library on Conan
    - All available versions of the llpkg
 
-  ![Index](./docs/llpkg_index.svg)
+  ![Index](./llpkg_index.svg)
 
 2. `/llpkgstore.json`: Provides the mapping table download.
 
-  ![Pkg detail](./docs/llpkg_pkg.svg)
+  ![Pkg detail](./llpkg_pkg.svg)
 
 **Note**: llpkg details are displayed in modals instead of new pages, as `llpkgstore.json` is loaded during the initial homepage access and does not require additional requests.
 
