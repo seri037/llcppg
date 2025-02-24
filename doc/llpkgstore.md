@@ -15,8 +15,8 @@ You can also use `llcppg` manually to generate llpkgs, but it's not very easy to
 llpkgstore is composed of the following components:
 
 1. A [GitHub repository](https://github.com/goplus/llpkg) that stores llpkgs, along with GitHub Actions for generating llpkgs automatically.
-3. A [CLI tool](#getting-an-llpkg) `llgo get` for users to get llpkgs.
 2. A [web service](#llpkggoplusorg) that provides version mapping queries and llpkg searches.
+3. A [CLI tool](#getting-an-llpkg) `llgo get` for users to get llpkgs.
 
 ## Directory structure
 
