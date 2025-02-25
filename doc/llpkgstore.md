@@ -441,15 +441,15 @@ This service is hosted by GitHub Pages, and the `llpkgstore.json` file is locate
 
   ![Index](./llpkg_index.svg)
 
-2. `/llpkgstore.json`: Provides the mapping table download.
-
   ![Pkg detail](./llpkg_pkg.svg)
+
+2. `/llpkgstore.json`: Provides the mapping table download.
 
 **Note**: llpkg details are displayed in modals instead of new pages, as `llpkgstore.json` is loaded during the initial homepage access and does not require additional requests.
 
 ### Interaction with web service
 
-When executing `llgo get clib@cversion`, a series of actions will be performed to convert `cversion` to `module_version`:
+When executing `llgo get clib@cversion`, a series of actions will be performed to map `cversion` to `module_version`:
 1. Fetch the latest `llpkgstore.json`
 2. Parse the JSON file to find the corresponding `module_version` array
 3. Select the latest patched version from the array
