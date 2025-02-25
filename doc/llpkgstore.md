@@ -52,7 +52,7 @@ llpkgstore is composed of the following components:
 - `llcppg.cfg`, `llcppg.symb.json`, `llcppg.pub`: config files of `llcppg`
 - `_demo`: tests to verify if llpkg can be imported, compiled and run as expected.
 
-To enable `llgo` to correctly identify the llpkg, an llpkg includes at minimum a llpkg.cfg configuration file.
+To enable `llgo` to correctly identify the llpkg, an llpkg includes at minimum a `llpkg.cfg` file.
 
 ## llpkg.cfg Structure
 
