@@ -453,7 +453,7 @@ When executing `llgo get clib@cversion`, a series of actions will be performed t
 1. Fetch the latest `llpkgstore.json`
 2. Parse the JSON file to find the corresponding `module_version` array
 3. Select the latest patched version from the array
-3. Retrieve llpkg
+4. Retrieve llpkg
 
 ## Environment variable design
 
