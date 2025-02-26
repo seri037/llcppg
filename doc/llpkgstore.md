@@ -137,7 +137,7 @@ It's the format of the part before `@` that determines the how `llgo get` will h
 >  1. `llgo` automatically resolves `clib@cversion` syntax into canonical `module_path@module_version` format.
 >  2. Pull the go module by `go get`.
 >  3. Check `llpkg.cfg` to determine if it's an llpkg. If it is: 
->    - `llgo get` will run `upstream.installer` to install binaries. `.pc` files for building will be stored in `${LLGOPCPATH}`.
+>    - `llgo get` will run `upstream.installer` to install binaries. `.pc` files for building will be stored in `{LLGOPCCACHE}`.
 >    - A comment in `go.mod` will be added to indicate the original `cversion`. Comments of indirect dependencies will be automatically processed by `go mod tidy`.
 >
 >       ```
@@ -425,7 +425,7 @@ Post-processing GitHub Action will tag the commit following the [Version Tag Rul
 
 ## llpkg.goplus.org
 
-This service is hosted by GitHub Pages, and the `llpkgstore.json` file is located in the same branch as GitHub Pages. When running `llgo get`, it will download the file to `LLGOPCPATH`.
+This service is hosted by GitHub Pages, and the `llpkgstore.json` file is located in the same branch as GitHub Pages. When running `llgo get`, it will download the file to `LLGOPCCACHE`.
 
 ### Function
 
@@ -455,9 +455,10 @@ When executing `llgo get clib@cversion`, a series of actions will be performed t
 3. Select the latest patched version from the array
 3. Retrieve llpkg
 
-## `LLGOPCPATH`
+## Environment variable design
 
 One usage is to store `.pc` files of the C library and allow `llgo build` to find them.
 
-1. `LLGOPCPATH` defaults to `{HOME}/.llgo/pkg-config/`.
-2. `{LLGOPCPATH}/{module_path}@{module_version}/` stores `.pc` files of C libs needed by llpkg.
+1. `LLGOPATH` defaults to `{UserCacheDir}/.llgo/`.
+2. `LLGOPCCACHE` defaults to `{LLGOPATH}/pkg-config/{module_path}@{module_version}/` which stores `.pc` files of C libs needed by llpkg.
+3. If `UserCacheDir` is not found, `LLGOPCPATH` defaults to `{HOME}/.llgo/`. `{LLGOPCPATH}/pkg-config/{module_path}@{module_version}/` stores `.pc` files of C libs needed by llpkg.
