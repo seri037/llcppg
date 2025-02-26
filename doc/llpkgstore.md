@@ -459,6 +459,6 @@ When executing `llgo get clib@cversion`, a series of actions will be performed t
 
 One usage is to store `.pc` files of the C library and allow `llgo build` to find them.
 
-1. `LLGOPATH` defaults to `{UserCacheDir}/.llgo/`.
-2. `LLGOPCCACHE` defaults to `{LLGOPATH}/pkg-config/{module_path}@{module_version}/` which stores `.pc` files of C libs needed by llpkg.
-3. If `UserCacheDir` is not found, `LLGOPCPATH` defaults to `{HOME}/.llgo/`. `{LLGOPCPATH}/pkg-config/{module_path}@{module_version}/` stores `.pc` files of C libs needed by llpkg.
+1. `LLGOCACHE` defaults to `{UserCacheDir}/llgo/`
+2. `.pc` files of C libs needed by llpkg will be stored in `{LLGOCACHE}/pkg-config/{module_path}@{module_version}/`
+3. If `UserCacheDir` isn't avaliable, `llgo` will exit with an error
